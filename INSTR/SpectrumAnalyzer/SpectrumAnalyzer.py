@@ -13,10 +13,20 @@ class SpectrumAnalyzer(BaseMXA):
         """
         super().__init__(resource, idQuery, reset)
         self.settings = SpectrumAnalyzerSettings()
-        self.configFreqStartStop(4e9, 20e9)
+        self.isNarrowBand = False
+        self.configFreqStartStop(2e9, 22e9)
+
+    @property
+    def narrowBand(self) -> bool:
+        return self.isNarrowBand
+            
+    @narrowBand.setter
+    def narrowBand(self, value: bool):
+        self isNarrowBand = value
 
     def configureAll(self, settings: SpectrumAnalyzerSettings):
         self.settings = settings
+        self.isNarrowBand = False
         self.configAcquisition(
             autoDetector = False,
             manualDetector = DetectorMode.AVERAGE,
@@ -52,18 +62,20 @@ class SpectrumAnalyzer(BaseMXA):
         )
 
     def configNarrowBand(self, center: float, span: float) -> tuple[bool, str]:
+        self.isNarrowBand = True
         self.configMarkerType(1, MarkerType.OFF)
-        self.configAcquisition(autoDetector = False, manualDetector = DetectorMode.NORMAL, sweepPoints = 1)
+        self.configAcquisition(autoDetector = False, manualDetector = DetectorMode.NORMAL, sweepPoints = 51)
         self.configFreqCenterSpan(center * 1e9, span * 1e9)
         self.configMarkerType(1, MarkerType.NORMAL)
         code, msg = self.errorQuery()
         return code == 0, msg
 
-    def measureNarrowBand(self) -> tuple[bool, str]:
+    def measureNarrowBand(self, averaging: int = 1, delay = 1) -> tuple[bool, str]:
         self.configTraceType(1, TraceType.AVERAGE)
-        self.configAveraging(50, AveragingType.RMS)
-        self.restartTrace()
-        time.sleep(1)
+        self.configAveraging(averaging, AveragingType.RMS)
+        if averaging > 1:
+            self.restartTrace()
+            time.sleep(delay)        
         iter = 3
         done = False
         # retry a couple times if we get an unreasonable power level:
@@ -78,6 +90,7 @@ class SpectrumAnalyzer(BaseMXA):
             return True, ""
         
     def endNarrowBand(self) -> tuple[bool, str]:
+        self.isNarrowBand = False
         self.configMarkerType(1, MarkerType.OFF)
     
     def configWideBand(self,
@@ -94,7 +107,12 @@ class SpectrumAnalyzer(BaseMXA):
         code, msg = self.errorQuery()
         return code == 0, msg
 
-    def measureWideBand(self) -> tuple[float, bool, str]:
+    def measureWideBand(self, averaging: int = 1, delay = 1) -> tuple[float, bool, str]:
+        if averaging > 1:
+            self.configTraceType(1, TraceType.AVERAGE)
+            self.configAveraging(averaging, AveragingType.RMS)
+            self.restartTrace()
+            time.sleep(delay)
         iter = 3
         done = False
         # retry a couple times if we get an unreasonable power level:
@@ -104,7 +122,7 @@ class SpectrumAnalyzer(BaseMXA):
             if -100 < self.markerY < 20:
                 done = True
         if iter == 0:
-            return 0.0, True, "SpectrumAnalyzer.measureNarrowBand: too many retries"
+            return 0.0, True, "SpectrumAnalyzer.measureWideBand: too many retries"
         else:
             return self.markerY, True, "" 
 

@@ -8,16 +8,20 @@ class YIGFilter():
     STEP_RESOLUTION = 2.7839    # resolution in MHz/step
     LATCH_BIT = 4096            # latch the new tuning
 
-    def __init__(self, resource="GPIB0::9::INSTR"):
+    def __init__(self, resource="GPIB0::9::INSTR", simulate = False):
         """Constructor
 
         :param str resource: VISA resource string, defaults to "GPIB0::13::INSTR"
         """
-        self.switchController = SwitchController(resource, writeConfig = SwitchConfig(
-            slot = 3,
-            port = DigitalPort.WORD_16BIT,
-            method = DigitalMethod.ASCII
-        ))
+        self.simulate = simulate
+        if simulate:
+            self.SwitchController = None
+        else:
+            self.switchController = SwitchController(resource, writeConfig = SwitchConfig(
+                slot = 3,
+                port = DigitalPort.WORD_16BIT,
+                method = DigitalMethod.ASCII
+            ))
         self.minGHz = self.MIN_TUNING_MHZ / 1000
         self.maxGHz = self.MAX_TUNING_MHZ / 1000
         self.reset()
@@ -27,7 +31,10 @@ class YIGFilter():
         self.freqGhz = self.minGHz
 
     def isConnected(self) -> bool:
-        return self.switchController.isConnected()
+        if self.simulate:
+            return True
+        else:
+            return self.switchController.isConnected()
 
     def setFrequency(self, freqGHz: float) -> None:
         if freqGHz < self.minGHz:
@@ -44,7 +51,8 @@ class YIGFilter():
 
         # we send the tuning word three times, the second time having the latch bit set:
         data = [tuningWord, tuningWord + self.LATCH_BIT, tuningWord]
-        self.switchController.digitalWrite(data)
+        if not self.simulate:
+            self.switchController.digitalWrite(data)
 
     def getFrequency(self) -> float:
         return self.freqGhz        

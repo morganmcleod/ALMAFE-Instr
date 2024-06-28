@@ -15,15 +15,19 @@ class OutputSelect(Enum):
     SQUARE_LAW = 16      # this is also the bit of the control word to send
     
 class OutputSwitch():
-    def __init__(self, resource="GPIB0::9::INSTR", reset: bool = True):
+    def __init__(self, resource="GPIB0::9::INSTR", reset: bool = True, simulate: bool = False):
         """Constructor
 
         :param str resource: VISA resource string, defaults to "GPIB0::9::INSTR"
         """
-        self.switchController = SwitchController(resource, writeConfig = SwitchConfig(
-            slot = 2,
-            port = DigitalPort.LOW_ORDER_8BIT
-        ))
+        self.simulate = simulate
+        if simulate:
+            self.switchController = None
+        else:
+            self.switchController = SwitchController(resource, writeConfig = SwitchConfig(
+                slot = 2,
+                port = DigitalPort.LOW_ORDER_8BIT
+            ))
         if reset:
             self.reset()
 
@@ -31,13 +35,16 @@ class OutputSwitch():
         self.setValue()
 
     def isConnected(self) -> bool:
-        return self.switchController.isConnected()
+        if self.simulate:
+            return True
+        else:
+            return self.switchController.isConnected()
 
     def setValue(self, output: OutputSelect = OutputSelect.POWER_METER, 
                        load: LoadSelect = LoadSelect.THROUGH,
                        pad: PadSelect = PadSelect.PAD_OUT) -> None:
-        # send the compliment of the byte having the selected bits:
-        self.switchController.staticWrite(255)
-        time.sleep(0.2)
-        self.switchController.staticWrite(255 - (output.value + load.value + pad.value))
-
+        if not simulate:
+            # send the compliment of the byte having the selected bits:
+            self.switchController.staticWrite(255)
+            time.sleep(0.2)
+            self.switchController.staticWrite(255 - (output.value + load.value + pad.value))
