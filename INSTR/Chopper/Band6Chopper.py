@@ -1,34 +1,29 @@
-from enum import Enum
-import serial
 import time
-from INSTR.Common.RemoveDelims import removeDelims
-from typing import Optional
 import logging
-from DebugOptions import *
-from Util.Singleton import Singleton
+import serial
+from enum import Enum
+from INSTR.Common.RemoveDelims import removeDelims
+from INSTR.Common.Singleton import Singleton
+from .Interface import Chopper_Interface, ChopperState
 
-class State(Enum):
-    OPEN = 0
-    TRANSITION = 1
-    CLOSED = 2
-    SPINNING = 3
-
-class Chopper(Singleton):
+class Chopper(Singleton, Chopper_Interface):
     """The band 6 chopper is based on an Intelligent Motion Systems Panther LE2 stepper motor controller.
     There are reflective tape marks on the chopper wheel so that the half-clock (HC) and full-clock (FC)
     positions can be sensed, for homing and for reporting its current position.
     Monitor and control is via RS232. The CTS and DSR lines are used as digital inputs for the HC and FC signals.
     """
 
-    def init(self, resource="COM1"):
+    def init(self, resource="COM1", openIsHot: bool = True, simulate: bool = False):
         """Constructor
 
         :param str resource: serial port to use, defaults to "COM1"
         :param bool findOpen: if True, index the chopper before returning. defaults to True
         :raises Exception: If the serial port cannot be opened.
         """
+        self._openIsHot = openIsHot
+        self.simulate = simulate
         self.logger = logging.getLogger("ALMAFE-CTS-Control")
-        self.spinning = False
+        self.spinning = False        
         try:
             self.inst = serial.Serial(
                 resource, 
@@ -40,11 +35,11 @@ class Chopper(Singleton):
                 self.inst.reset_input_buffer()
                 self.inst.reset_output_buffer()
                 self.reset()
-            elif SIMULATE:
+            elif self.simulate:
                 return
                 
         except:
-            if SIMULATE:
+            if self.simulate:
                 return
 
     def reset(self):
@@ -59,30 +54,30 @@ class Chopper(Singleton):
         self.__findOpen()
         self.spinning = False
 
-    def isConnected(self) -> bool:
-        if SIMULATE:
+    def is_connected(self) -> bool:
+        if self.simulate:
             return True
         # request position
         read = self.__serialWrite("Z 0\r")
         return True if read else False
 
-    def getState(self) -> State:
+    def getState(self) -> ChopperState:
         """Get the chopper state
 
         :return State: one of OPEN, CLOSED, or TRANSITION
         """
         HC, FC = self.__getClockBits()
         if HC and FC: 
-            return State.CLOSED
+            return ChopperState.CLOSED
         elif HC and not FC: 
-            return State.OPEN
+            return ChopperState.OPEN
         else: 
-            return State.TRANSITION
+            return ChopperState.TRANSITION
 
     def isSpinning(self) -> bool:
         return self.spinning
 
-    def spin(self, rps:float):
+    def spin(self, rps: float = 1.0):
         """Start spinning the chopper at a fixed revolutions per second (rps)
 
         :param float rps: how fast
@@ -129,10 +124,16 @@ class Chopper(Singleton):
         self.spinning = False
 
     def gotoHot(self):
-        self.open()
+        if self._openIsHot:
+            self.open()
+        else:
+            self.close()
 
     def gotoCold(self):
-        self.close()
+        if self._openIsHot:
+            self.close()
+        else:
+            self.open()
 
     def gotoPosition(self, pos:int):
         """Go to the specified index position
@@ -284,7 +285,7 @@ class Chopper(Singleton):
             return __isMoving
         return False
        
-    def __serialWrite(self, cmd:str) -> Optional[str]:
+    def __serialWrite(self, cmd:str) -> str | None:
         """Write to the serial device and read the reply
 
         :param str cmd: string to write
