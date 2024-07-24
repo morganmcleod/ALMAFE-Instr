@@ -236,6 +236,30 @@ class BaseMXA():
         code, msg = self.errorQuery()
         return code == 0, msg
 
+    def configTrigger(self,
+            source: TriggerSource = TriggerSource.FREE_RUN,
+            level: float = -20,
+            slope: TriggerSlope = TriggerSlope.POSITIVE,
+            enableDelay: bool = False,
+            delay: float = 1e-6) -> tuple[bool, str]:
+        self.inst.write(f":TRIG:SOUR {source.value};")
+        if source == TriggerSource.FREE_RUN:
+            return True, ""
+        
+        if source == TriggerSource.LINE:
+            # Trigger Level cannot be set if Trigger Source is LINE
+            self.inst.write(f":TRIG:SLOP {slope.value};")
+        elif source == TriggerSource.RF_BURST:
+            # RF burst settings
+            self.inst.write(f":TRIG:{source.value}:LEV:ABS {delay};:TRIG:{source.value}:SLOP {slope.value};")
+        else:
+            # Default: Trigger Level, Trigger Slope
+            self.inst.write(f":TRIG:{source.value}:SLOP {slope.value};:TRIG:{source.value}:LEV {level};")
+        if enableDelay:
+            self.inst.write(f":TRIG:{source.value}:DEL:STAT ON;:TRIG:{source.value}:DEL {delay};")
+        else:
+            self.inst.write(f":TRIG:{source.value}:DEL:STAT OFF;")
+
     def configMarkerType(self,
             markerNum: int = 1,
             type: MarkerType = MarkerType.NORMAL,

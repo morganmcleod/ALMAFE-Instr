@@ -53,6 +53,19 @@ class MarkerFunction(Enum):
     BAND_POWER = "BPOW"
     BAND_DENSITY = "BDEN"
 
+class TriggerSource(Enum):
+    FREE_RUN = "IMM"
+    VIDEO = "VID"
+    LINE = "LINE"
+    EXTERNAL1 = "EXT1"
+    EXTERNAL2 = "EXT2"
+    RF_BURST = "RFB"
+
+class TriggerSlope(Enum):
+    POSITIVE = "POS"
+    NEGATIVE = "NEG"
+
+    
 class SpectrumAnalyzerSettings(BaseModel):
     sweepPoints: int = 2001
     attenuation: float = 2
