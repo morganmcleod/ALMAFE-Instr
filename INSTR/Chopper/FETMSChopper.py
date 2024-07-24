@@ -9,12 +9,12 @@ class Chopper(Chopper_Interface, Singleton):
         self._openIsHot = openIsHot
         self.simulate = simulate
         if not simulate:        
-            self.taskSensor = self._initTask('Dev1/port0/line2', 'inSensor', True)
-            self.taskBusy = self._initTask('Dev1/port0/line6', 'inBusy', True)
-            self.taskOpenClose = self._initTask('Dev1/port0/line3', 'outOpenClose', False)
-            self.taskSpeed = self._initTask('Dev1/port0/line1', 'outSpeed', False)
-            self.taskSpin = self._initTask('Dev1/port0/line4', 'outSpin', False)
-            self.taskEnable = self._initTask('Dev1/port0/line5', 'outEnable', False)
+            self.taskBusy = self._initTask('Dev2/port0/line6', 'inBusy', True)
+            self.taskSensor = self._initTask('Dev2/port0/line2', 'inSensor', True)
+            self.taskSpeed = self._initTask('Dev2/port0/line1', 'outSpeed', False)
+            self.taskOpenClose = self._initTask('Dev2/port0/line3', 'outOpenClose', False)
+            self.taskSpin = self._initTask('Dev2/port0/line4', 'outSpin', False)
+            self.taskEnable = self._initTask('Dev2/port0/line5', 'outEnable', False)
             self.taskSensor.start()
             self.taskBusy.start()
             self.taskSpeed.start()

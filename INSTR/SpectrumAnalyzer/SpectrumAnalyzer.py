@@ -22,7 +22,7 @@ class SpectrumAnalyzer(BaseMXA):
             
     @narrowBand.setter
     def narrowBand(self, value: bool):
-        self isNarrowBand = value
+        self.isNarrowBand = value
 
     def configureAll(self, settings: SpectrumAnalyzerSettings):
         self.settings = settings
