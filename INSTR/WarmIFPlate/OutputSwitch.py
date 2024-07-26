@@ -43,7 +43,7 @@ class OutputSwitch():
     def setValue(self, output: OutputSelect = OutputSelect.POWER_METER, 
                        load: LoadSelect = LoadSelect.THROUGH,
                        pad: PadSelect = PadSelect.PAD_OUT) -> None:
-        if not simulate:
+        if not self.simulate:
             # send the compliment of the byte having the selected bits:
             self.switchController.staticWrite(255)
             time.sleep(0.2)

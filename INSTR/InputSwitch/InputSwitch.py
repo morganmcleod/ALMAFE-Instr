@@ -29,7 +29,7 @@ class InputSwitch(InputSwitch_Interface):
 
     def reset(self) -> None:    
         self.position = None
-        self.select(InputSelect.POL0_USB)
+        self.selected = InputSelect.POL0_USB
 
     def is_connected(self) -> bool:
         if self.simulate:
@@ -70,5 +70,5 @@ class InputSwitch(InputSwitch_Interface):
             elif sideband == 1:
                 self.selected = InputSelect.POL1_LSB
 
-   def select_noise_source(self) -> None:
+    def select_noise_source(self) -> None:
         self.selected = InputSelect.NOISE_SOURCE

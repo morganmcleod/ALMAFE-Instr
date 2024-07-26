@@ -54,7 +54,7 @@ class Chopper(Singleton, Chopper_Interface):
         self.__findOpen()
         self.spinning = False
 
-    def is_connected(self) -> bool:
+    def isConnected(self) -> bool:
         if self.simulate:
             return True
         # request position
@@ -73,6 +73,10 @@ class Chopper(Singleton, Chopper_Interface):
             return ChopperState.OPEN
         else: 
             return ChopperState.TRANSITION
+
+    @property
+    def openIsHot(self) -> bool:
+        return self._openIsHot
 
     def isSpinning(self) -> bool:
         return self.spinning

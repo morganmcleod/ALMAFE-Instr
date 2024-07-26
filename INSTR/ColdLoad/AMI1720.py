@@ -107,7 +107,10 @@ class AMI1720(ColdLoadBase, Singleton):
             self.logger.debug(f" -> '{response}'")
             response = removeDelims(response)
         if len(response) == 2:
-            mode = FillMode(int(response[0]))
+            try:
+                mode = FillMode(int(response[0]))
+            except:
+                mode = None
         if mode is not None:
             return mode
         else:
