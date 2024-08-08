@@ -1,5 +1,6 @@
 from INSTR.Common.RemoveDelims import removeDelims
-from .schemas import Channel, Trigger, Unit, StdErrConfig, StdErrResult
+from ALMAFE.basic.Units import Units
+from .schemas import Channel, Trigger, StdErrConfig, StdErrResult
 from .BaseE441X import BaseE441X
 from time import time
 from statistics import mean, stdev
@@ -25,7 +26,7 @@ class PowerMeter(BaseE441X):
 
         :return bool: True if instrument responed to Operation Complete query
         """
-        ok = self.setUnits(Unit.DBM)
+        ok = self.setUnits(Units.DBM)
         if ok:
             ok = self.setFastMode(False)
         if ok:
@@ -39,10 +40,10 @@ class PowerMeter(BaseE441X):
         """
         self.inst.timeout = timeoutMs if timeoutMs else self.DEFAULT_TIMEOUT
 
-    def setUnits(self, units: Unit, channel = None):
+    def setUnits(self, units: Units, channel = None):
         """Set power meter units
 
-        :param Unit units: DBM or W
+        :param Units units: DBM or W
         :param Channel channel: which channel to configure, defaults to None which configures both channels if supported
         :return bool: True if instrument responed to Operation Complete query
         """
@@ -83,12 +84,12 @@ class PowerMeter(BaseE441X):
         :return bool: True if instrument responed to Operation Complete query
         """
         if not channel or channel == Channel.A:
-            self.configMeasurement(Channel.A, units = self.settings[Channel.A].get('units', Unit.DBM))
+            self.configMeasurement(Channel.A, units = self.settings[Channel.A].get('units', Units.DBM))
             self.inst.write("SENS1:AVER:STAT 0;")
             self.inst.write("SENS1:FREQ:CW 6E9;")
             self.initContinuous(True, Channel.A)
         if (not channel or channel == Channel.B) and self.twoChannel:
-            self.configMeasurement(Channel.B, units = self.settings[Channel.B].get('units', Unit.DBM))
+            self.configMeasurement(Channel.B, units = self.settings[Channel.B].get('units', Units.DBM))
             self.inst.write("SENS2:AVER:STAT 0;")
             self.inst.write("SENS2:FREQ:CW 6E9;")
             self.initContinuous(True, Channel.B)
@@ -108,7 +109,7 @@ class PowerMeter(BaseE441X):
             self.setFastMode(False, channel)
         # self.setTimeout(60000)
         self.configureTrigger(Trigger.IMMEDIATE, channel)
-        self.configMeasurement(channel, units = self.settings[channel].get('units', Unit.DBM))
+        self.configMeasurement(channel, units = self.settings[channel].get('units', Units.DBM))
         self.initImmediate(channel)
         value = self.read(channel)
         self.setTimeout()

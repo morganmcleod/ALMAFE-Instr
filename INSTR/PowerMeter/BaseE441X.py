@@ -1,6 +1,7 @@
 from INSTR.Common.RemoveDelims import removeDelims
 from INSTR.Common.VisaInstrument import VisaInstrument
-from .schemas import Channel, Trigger, Unit
+from ALMAFE.basic.Units import Units
+from .schemas import Channel, Trigger
 import re
 import pyvisa
 import logging
@@ -158,13 +159,13 @@ class BaseE441X():
         opc = removeDelims(self.inst.query("*OPC?"))
         return opc and opc[0]
 
-    def configMeasurement(self, channel = Channel.A, resolution = 3, units = Unit.DBM):
+    def configMeasurement(self, channel = Channel.A, resolution = 3, units = Units.DBM):
         """Configure measurement options.
         TODO: for now this implementation covers way less than the LabVIEW equivalent
 
         :param Channel channel: which channel to configure, defaults to Channel.A
         :param int resolution: number of decimal places, defaults to 3
-        :param Unit units, defaults to Unit.DBM
+        :param Units units, defaults to Units.DBM
         :return bool: True if instrument responed to Operation Complete query
         """
         if channel == Channel.B and not self.twoChannel:

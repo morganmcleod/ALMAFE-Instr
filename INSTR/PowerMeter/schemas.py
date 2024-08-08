@@ -69,10 +69,6 @@ class Channel(Enum):
     A = 1
     B = 2
 
-class Unit(Enum):
-    DBM = "DBM"
-    W = "W"
-
 class Trigger(Enum):
     IMMEDIATE = "IMM"
     BUS = "BUS"
