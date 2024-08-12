@@ -37,7 +37,7 @@ class BaseMXA():
         except:
             pass
 
-        ok = self.isConnected()
+        ok = self.connected()
         if ok and idQuery:
             ok = self.idQuery()
         if ok and reset:
@@ -48,7 +48,15 @@ class BaseMXA():
         """
         self.inst.close()
 
-    def isConnected(self) -> bool:
+    @property
+    def deviceInfo(self) -> dict:
+        return {
+            "name": "spectrum analyzer",
+            "resource": self.inst.resource,
+            "connected": self.connected()
+        }
+        
+    def connected(self) -> bool:
         if not self.inst.connected:
             return False
         try:

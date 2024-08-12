@@ -22,7 +22,7 @@ class AttenuatorSwitchController():
     def reset(self):
         self.setSwitches(self.RESET)
 
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         return self.inst.connected
 
     def setSwitch(self, index: int, value: bool = False) -> None:

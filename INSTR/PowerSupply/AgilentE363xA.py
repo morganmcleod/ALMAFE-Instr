@@ -19,7 +19,7 @@ class PowerSupply():
         self.mfr = None
         self.model = None
         self.inst = VisaInstrument(resource, timeout = self.DEFAULT_TIMEOUT)
-        ok = self.isConnected()
+        ok = self.connected()
         if ok and idQuery:
             ok = self.idQuery()
         if ok and reset:
@@ -30,7 +30,7 @@ class PowerSupply():
         """
         self.inst.close()
     
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         if not self.inst.connected:
             return False
         try:

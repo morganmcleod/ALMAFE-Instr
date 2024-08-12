@@ -14,8 +14,13 @@ class InputSwitch_Interface(ABC):
     def reset(self) -> None:
         pass
 
+    @property
     @abstractmethod
-    def is_connected(self) -> bool:
+    def device_info(self) -> dict:
+        pass
+
+    @abstractmethod
+    def connected(self) -> bool:
         pass
 
     @property

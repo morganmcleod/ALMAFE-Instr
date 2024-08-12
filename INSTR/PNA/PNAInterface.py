@@ -15,6 +15,10 @@ class PNAInterface(ABC):
         pass
 
     @abstractmethod
+    def deviceInfo(self) -> dict:
+        pass
+    
+    @abstractmethod
     def errorQuery(self) -> Tuple[int, str]:
         pass
     
@@ -26,7 +30,7 @@ class PNAInterface(ABC):
         pass
 
     @abstractmethod
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         pass
 
     @abstractmethod
@@ -49,7 +53,6 @@ class PNAInterface(ABC):
         :return Tuple[List[float], List[float]]
         """
         pass
-
     
     @abstractmethod
     def getAmpPhase(self) -> Tuple[float]:

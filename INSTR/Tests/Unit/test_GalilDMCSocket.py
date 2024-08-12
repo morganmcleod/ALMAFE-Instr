@@ -20,7 +20,7 @@ class test_GalilDMCSocket(unittest.TestCase):
     
     def test_reset(self):
         self.mc.reset()
-        self.assertTrue(self.mc.isConnected())
+        self.assertTrue(self.mc.connected())
         self.assertEqual(self.mc.nextPos, Position(x=0, y=0, z=0))
         self.assertEqual(self.mc.position, Position(x=0, y=0, z=0))
         self.assertEqual(self.mc.motorStatus, MotorStatus())
@@ -42,7 +42,7 @@ class test_GalilDMCSocket(unittest.TestCase):
     def test_isConnected(self):
         for i in range(100):
             with self.subTest():
-                self.assertTrue(self.mc.isConnected())
+                self.assertTrue(self.mc.connected())
 
     def Xtest_setXYSpeed(self):
         prev = self.mc.getXYSpeed()

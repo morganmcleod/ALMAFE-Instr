@@ -42,7 +42,7 @@ class SwitchController():
     def reset(self) -> None:
         self.inst.write("CRESET 1, 2, 3")
 
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         return self.inst.connected
 
     def staticRead(self) -> int:

@@ -16,7 +16,7 @@ class Chopper_Interface(ABC):
         pass
 
     @abstractmethod
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         pass
 
     @abstractmethod

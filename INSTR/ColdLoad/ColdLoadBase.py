@@ -64,7 +64,7 @@ class ColdLoadBase(ABC):
         return True
 
     @abstractmethod
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         return True
 
     def startFill(self) -> None:

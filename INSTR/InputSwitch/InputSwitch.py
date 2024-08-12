@@ -18,10 +18,11 @@ class InputSwitch(InputSwitch_Interface):
         :param str resource: VISA resource string, defaults to "GPIB0::9::INSTR"
         """
         self.simulate = simulate
+        self.resource = "simulated" if simulate else resource
         if simulate:
             self.switchController = None
         else:
-            self.switchController = SwitchController(resource, writeConfig = SwitchConfig(
+            self.switchController = SwitchController(self.resource, writeConfig = SwitchConfig(
                 slot = 1,
                 port = DigitalPort.LOW_ORDER_8BIT
             ))
@@ -31,11 +32,19 @@ class InputSwitch(InputSwitch_Interface):
         self.position = None
         self.selected = InputSelect.POL0_USB
 
-    def is_connected(self) -> bool:
+    @property
+    def device_info(self) -> dict:
+        return {
+            "name": "Warm IF Plate input switch",
+            "resource": self.resource,
+            "connected": self.connected()
+        }
+        
+    def connected(self) -> bool:
         if self.simulate:
             return True
         else:
-            return self.switchController.isConnected()
+            return self.switchController.connected()
 
     @property
     def selected(self) -> InputSelect:

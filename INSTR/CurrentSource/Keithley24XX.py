@@ -33,7 +33,7 @@ class CurrentSource():
         self.inst = VisaInstrument(resource, timeout = self.DEFAULT_TIMEOUT)
         if reset:
             self.reset()
-        ok = self.isConnected()
+        ok = self.connected()
         if ok and idQuery:
             ok = self.idQuery()
         if ok and reset:
@@ -44,7 +44,7 @@ class CurrentSource():
         """
         self.inst.close()
 
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         if not self.inst.connected:
             return False
         try:

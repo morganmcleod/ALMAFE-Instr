@@ -179,7 +179,7 @@ class MotorController(MCInterface):
                 item.response = self.recv(item.replySize)
             item.complete = True
 
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         try:
             hs=self.query(b';')
             return hs == b':'

@@ -28,7 +28,7 @@ class BaseE441X():
             self.inst.inst.end_output = pyvisa.constants.termination_char
             self.inst.write(":SYST:COMM:SER:TRAN:ECHO\sOFF;")
 
-        ok = self.isConnected()
+        ok = self.connected()
         if ok and idQuery:
             ok = self.idQuery()
         if ok and reset:
@@ -39,7 +39,7 @@ class BaseE441X():
         """
         self.inst.close()
 
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         if not self.inst.connected:
             return False
         try:

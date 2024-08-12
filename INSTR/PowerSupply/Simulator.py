@@ -12,7 +12,7 @@ class PowerSupplySimulator():
     def reset(self):
         return True
         
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         return True
 
     def errorQuery(self):

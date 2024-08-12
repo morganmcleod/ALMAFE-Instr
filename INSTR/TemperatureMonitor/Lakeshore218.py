@@ -18,7 +18,7 @@ class TemperatureMonitor():
         self.logger = logging.getLogger("ALMAFE-CTS-Control")
         self.lock = Lock()        
         self.inst = VisaInstrument(resource, timeout = self.DEFAULT_TIMEOUT, read_termination = '\n', write_termination = '\n')
-        ok = self.isConnected()
+        ok = self.connected()
         if ok and idQuery:
             ok = self.idQuery()
         if ok and reset:
@@ -31,7 +31,7 @@ class TemperatureMonitor():
             self.inst.close()
             self.inst = None
 
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         if not self.inst.connected:
             return False
         try:

@@ -12,7 +12,7 @@ class SignalGenInterface(ABC):
         pass
 
     @abstractmethod
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         pass
 
     @abstractmethod
@@ -20,7 +20,7 @@ class SignalGenInterface(ABC):
         return 0, "No error"
 
     @abstractmethod
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         return True
     
     @abstractmethod

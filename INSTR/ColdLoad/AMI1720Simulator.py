@@ -32,7 +32,7 @@ class AMI1720Simulator(ColdLoadBase, Singleton):
         """
         return True
         
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         return True
 
     def setFillMode(self, fillMode: FillMode) -> None:

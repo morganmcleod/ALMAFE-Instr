@@ -8,7 +8,7 @@ class SignalGenSimulator(SignalGenInterface):
         if reset:
             self.reset()
 
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         return True
 
     def idQuery(self, doPrint = False):
@@ -30,7 +30,7 @@ class SignalGenSimulator(SignalGenInterface):
         """
         return (0, "No error")
 
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         return True
     
     def setAmplitude(self, amp_dB:float) -> bool:

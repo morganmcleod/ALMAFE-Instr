@@ -23,7 +23,7 @@ class SignalGenerator(SignalGenInterface):
             read_termination = '\n',
             write_termination = '\n'
         )
-        ok = self.isConnected()
+        ok = self.connected()
         if ok and idQuery:
             ok = self.idQuery()
         if ok and reset:
@@ -36,7 +36,7 @@ class SignalGenerator(SignalGenInterface):
             self.inst.close()
             self.inst = None
 
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         if not self.inst.connected:
             return False
         try:
@@ -109,7 +109,7 @@ class SignalGenerator(SignalGenInterface):
             self.inst = None
             return (None, err.abbreviation)
 
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         if not self.inst:
             return False
         code, _ = self.errorQuery()

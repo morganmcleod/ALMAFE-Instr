@@ -70,7 +70,7 @@ class HP34401():
             self.inst.inst.flush(pyvisa.constants.VI_IO_IN_BUF_DISCARD | pyvisa.constants.VI_IO_OUT_BUF_DISCARD)
             self.inst.inst.bytes_in_buffer = 4096
 
-        ok = self.isConnected()
+        ok = self.connected()
         if ok and idQuery:
             ok = self.idQuery()
         if ok and reset:
@@ -81,7 +81,7 @@ class HP34401():
         """
         self.inst.close()
 
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         if not self.inst.connected:
             return False
         try:

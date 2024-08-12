@@ -11,7 +11,7 @@ class MCError(Exception):
 class MCInterface(ABC):
 
     @abstractmethod
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         pass
 
     @abstractmethod

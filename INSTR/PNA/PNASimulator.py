@@ -16,6 +16,13 @@ class PNASimulator(PNAInterface):
         ret = "PNASimuilator"
         return ret
     
+    def deviceInfo(self) -> dict:
+        return {
+            "name": "PNA",
+            "resource": "simulated",
+            "connected": True
+        }
+
     def errorQuery(self) -> Tuple[int, str]:
         return (0, "")
 
@@ -25,7 +32,7 @@ class PNASimulator(PNAInterface):
         """
         return True
 
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         return True
 
     def setMeasConfig(self, config: MeasConfig):

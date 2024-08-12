@@ -26,7 +26,7 @@ class AMI1720(ColdLoadBase, Singleton):
             read_termination = '\n',
             write_termination = '\n'
         )
-        ok = self.isConnected()        
+        ok = self.connected()        
         if ok and idQuery:
             ok = self.idQuery()
         if ok and reset:
@@ -39,7 +39,7 @@ class AMI1720(ColdLoadBase, Singleton):
         """
         self.inst.close()
 
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         # *TST? Returns a value incremented by 1 for each query to the requesting
         # interface if unit is functioning. Return value does not indicate any
         # operational status other than a functioning interface.

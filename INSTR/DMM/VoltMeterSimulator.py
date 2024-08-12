@@ -28,7 +28,7 @@ class VoltMeterSimulator():
         self.logger.info("VoltMeterSimulator.reset")
         return True
     
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         return True
         
     def configureMeasurement(self, 

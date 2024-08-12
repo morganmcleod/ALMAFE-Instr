@@ -83,7 +83,7 @@ class Chopper(Chopper_Interface, Singleton):
             busy = self.taskBusy.read()
             time.sleep(0.010)
 
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         if self.simulate:
             return True
         else:

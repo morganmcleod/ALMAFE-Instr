@@ -10,6 +10,7 @@ class ExternalSwitch(InputSwitch_Interface):
         :param str resource: VISA resource string,
         """
         self.simulate = simulate
+        self.resource = "simulated" if simulate else resource
         if simulate:
             self.switchController = None
         else:
@@ -21,11 +22,19 @@ class ExternalSwitch(InputSwitch_Interface):
             self.switchController.setSwitches(self.switchController.RESET)
         self.selected = InputSelect.POL0_USB
 
-    def is_connected(self) -> bool:
+    @property
+    def device_info(self) -> dict:
+        return {
+            "name": "B6v2 external input switch",
+            "resource": self.resource,
+            "connected": self.connected()
+        }
+        
+    def connected(self) -> bool:
         if self.simulate:
             return True
         else:
-            return self.switchController.isConnected()
+            return self.switchController.connected()
 
     @property
     def selected(self) -> InputSelect:

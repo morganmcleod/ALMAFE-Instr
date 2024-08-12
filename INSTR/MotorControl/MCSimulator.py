@@ -33,7 +33,7 @@ class MCSimulator(MCInterface):
         self.lastPos = deepcopy(self.position)
         self.nextPos = deepcopy(self.position)
     
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         return True
     
     def setXYSpeed(self, speed:float = XY_SPEED):

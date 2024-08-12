@@ -9,7 +9,7 @@ class PowerMeterSimulator():
         self.settings = {Channel.A : {}, Channel.B: {}}
         self.setDefaults()
         
-    def isConnected(self) -> bool:
+    def connected(self) -> bool:
         return True
     
     def setDefaults(self):

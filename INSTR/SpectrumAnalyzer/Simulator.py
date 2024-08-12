@@ -11,13 +11,22 @@ class SpectrumAnalyzerSimulator():
         self.logger = logging.getLogger("ALMAFE-CTS-Control")
         self.mfr = None
         self.model = None
-        ok = self.isConnected()
+        ok = self.connected()
         if ok and idQuery:
             ok = self.idQuery()
         if ok and reset:
             ok = self.reset()
 
-    def isConnected(self) -> bool:
+    @property
+    def deviceInfo(self) -> dict:
+        return {
+            "name": "simulated spectrum analyzer",
+            "resource": "simulated",
+            "connected": True
+        }
+        
+        
+    def connected(self) -> bool:
         return True
         
     def idQuery(self):

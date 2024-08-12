@@ -15,13 +15,20 @@ class BaseAgilentPNA(PNAInterface):
     def __init__(self, resource="GPIB0::16::INSTR", idQuery=True, reset=True):
         self.logger = logging.getLogger()
         self.inst = VisaInstrument(resource, timeout = self.DEFAULT_TIMEOUT)        
-        ok = self.isConnected()
+        ok = self.connected()
         if ok and idQuery:
             ok = self.idQuery()
         if ok and reset:
             ok = self.reset()
 
-    def isConnected(self) -> bool:
+    def deviceInfo(self) -> dict:
+        return {
+            "name": "Agilent PNA",
+            "resource": self.inst.resource,
+            "connected": self.connected()
+        }
+        
+    def connected(self) -> bool:
         # *TST? Returns the result of a query of the analyzer hardward status. An 0 indicates no failures found.
         if not self.inst.connected:
             return False

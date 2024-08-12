@@ -4,14 +4,14 @@ import logging
 
 class VisaInstrument():
     def __init__(self,
-            resource_name: str,
+            resource: str,
             max_errors: int = 5,            
             **kwargs: Any):
         self.logger = logging.getLogger("ALMAFE-CTS-Control")
         rm = pyvisa.ResourceManager()
-        self.resource_name = resource_name
+        self.resource = resource
         try:
-            self.inst = rm.open_resource(resource_name, **kwargs)
+            self.inst = rm.open_resource(resource, **kwargs)
             self.connected = True
         except Exception as e:
             print(e)
@@ -53,5 +53,5 @@ class VisaInstrument():
     def __count_error(self):
         self.errors_countdown -= 1
         if self.errors_countdown == 0:
-            self.logger.error(f"VisaInstrument {self.resource_name} stopping: too many errors ({self.max_errors}).")
+            self.logger.error(f"VisaInstrument {self.resource} stopping: too many errors ({self.max_errors}).")
             self.connected = False
