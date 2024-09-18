@@ -104,9 +104,6 @@ class MotorController(MCInterface):
         time.sleep(1.0)
         hs = self.query(b'XQ #SETUP;')
         self.__checkHandshake("MotorController.reset", b':', hs)
-        time.sleep(1.0)
-        self.setNextPos(Position(x = self.position.x, y = self.position.y, pol = -58.5))
-        self.startMove()
 
     def flush(self):
         flushed = b''
