@@ -1,4 +1,5 @@
-from .schemas import Channel, Trigger, Unit, StdErrConfig, StdErrResult
+from .schemas import Channel, Trigger, StdErrConfig, StdErrResult
+from ALMAFE.basic.Units import Units
 from time import time
 from statistics import mean, stdev
 from math import sqrt
@@ -17,7 +18,7 @@ class PowerMeterSimulator():
 
         :return bool: True if instrument responed to Operation Complete query
         """
-        ok = self.setUnits(Unit.DBM)
+        ok = self.setUnits(Units.DBM)
         if ok:
             ok = self.setFastMode(False)
         if ok:
@@ -31,7 +32,7 @@ class PowerMeterSimulator():
         """
         pass
 
-    def setUnits(self, units: Unit, channel = None):
+    def setUnits(self, units: Units, channel = None):
         if channel is None:
             channel = Channel.A
         self.settings[channel]['units'] = units

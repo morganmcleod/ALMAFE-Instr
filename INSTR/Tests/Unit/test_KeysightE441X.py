@@ -1,5 +1,5 @@
 import unittest
-from INSTR.PowerMeter.BaseE441X import Channel, Trigger, Unit
+from INSTR.PowerMeter.BaseE441X import Channel, Trigger, Units
 from INSTR.PowerMeter.KeysightE441X import PowerMeter, StdErrConfig
 import logging
 
@@ -40,11 +40,11 @@ class test_PowerMeter(unittest.TestCase):
         self.assertFalse(self.__implErrorQuery())
 
     def test_setUnits(self):
-        self.assertTrue(self.pm.setUnits(Unit.W, Channel.A))
-        self.assertTrue(self.pm.setUnits(Unit.DBM, Channel.A))
+        self.assertTrue(self.pm.setUnits(Units.W, Channel.A))
+        self.assertTrue(self.pm.setUnits(Units.DBM, Channel.A))
         if self.pm.twoChannel:
-            self.assertTrue(self.pm.setUnits(Unit.W, Channel.B))
-            self.assertTrue(self.pm.setUnits(Unit.DBM, Channel.B))
+            self.assertTrue(self.pm.setUnits(Units.W, Channel.B))
+            self.assertTrue(self.pm.setUnits(Units.DBM, Channel.B))
 
     def test_setFastMode(self):
         self.assertTrue(self.pm.setFastMode(True, Channel.A))
@@ -63,13 +63,13 @@ class test_PowerMeter(unittest.TestCase):
         self.assertTrue(self.pm.setOutputRef(False))
         
     def test_read(self):
-        self.pm.configMeasurement(Channel.A, units = Unit.DBM)
+        self.pm.configMeasurement(Channel.A, units = Units.DBM)
         self.pm.configureTrigger(Trigger.IMMEDIATE, Channel.A)
         self.pm.initImmediate(Channel.A)
         val = self.pm.read(Channel.A)
         self.assertTrue(val != 0.0)
         if self.pm.twoChannel:
-            self.pm.configMeasurement(Channel.B, units = Unit.DBM)
+            self.pm.configMeasurement(Channel.B, units = Units.DBM)
             self.pm.configureTrigger(Trigger.IMMEDIATE, Channel.B)
             self.pm.initImmediate(Channel.B)
             val = self.pm.read(Channel.B)
