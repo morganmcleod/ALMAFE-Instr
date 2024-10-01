@@ -112,7 +112,6 @@ class HP34401():
 
         :return bool: True if write succeeded
         """
-        self.triggerConfigured = False
         self.multipointConfigured = False
 
         if self.inst.write("*RST"):
@@ -154,21 +153,13 @@ class HP34401():
     def configureAutoZero(self, autoZero: AutoZero = AutoZero.OFF):
         self.inst.write(f":SENS:ZERO:AUTO {autoZero.value}")
 
-    def readSinglePoint(self) -> Optional[float]:
-        if not self.triggerConfigured:
-            self.configureTrigger(TriggerSource.IMMEDIATE)
-        if not self.multipointConfigured:
-            self.configureMultipoint(triggerCount = 1, sampleCount = 1)
-        self.initiateMeasurement()
-        result = None
-        success = True
-        
-        while success and not result: 
-            success, result = self.fetchMeasurement()
-        if success:
-            return result[0]
-        else:
-            return None
+    def readSinglePoint(self) -> list[float]:
+        self.inst.write("READ?")
+        try:
+            response = self.inst.read().split(',')
+            return [float(r) for r in response]
+        except:
+            return []
 
     def configureTrigger(self,
             triggerSource: TriggerSource,
@@ -191,7 +182,6 @@ class HP34401():
             command += f":TRIG:LEV {internalLevel}; TRIG:SLOP {slope.value};"
 
         self.inst.write(command)
-        self.triggerConfigured = True
 
     def configureMultipoint(self,
             triggerCount: int = 1,
