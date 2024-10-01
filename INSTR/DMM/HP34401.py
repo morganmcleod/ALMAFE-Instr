@@ -153,7 +153,7 @@ class HP34401():
     def configureAutoZero(self, autoZero: AutoZero = AutoZero.OFF):
         self.inst.write(f":SENS:ZERO:AUTO {autoZero.value}")
 
-    def readSinglePoint(self) -> list[float]:
+    def read(self) -> list[float]:
         self.inst.write("READ?")
         try:
             response = self.inst.read().split(',')
@@ -202,9 +202,7 @@ class HP34401():
     def initiateMeasurement(self) -> None:
         if self.triggerSource == TriggerSource.SOFTWARE:
             command = "INIT;"
-        else:
-            command = "READ?"
-        self.inst.write(command)
+            self.inst.write(command)
 
     def fetchMeasurement(self, timeout: int = 10000) -> Tuple[bool, List[float]]:
         if self.triggerSource == TriggerSource.SOFTWARE:                

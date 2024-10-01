@@ -47,8 +47,8 @@ class VoltMeterSimulator():
     def configureAutoZero(self, autoZero: AutoZero = AutoZero.OFF):
         pass
 
-    def readSinglePoint(self) -> Optional[float]:
-        return randrange(0, 100) / 100
+    def read(self) -> list[float]:
+        return [randrange(0, 100) / 100]
 
     def configureTrigger(self,
             triggerSource: TriggerSource,
