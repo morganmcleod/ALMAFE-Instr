@@ -433,8 +433,8 @@ class MotorController(MCInterface):
         # negate because motors are opposite what we want to call (0,0)
         try:
             self.position = Position(
-                x = round(-(int(data[0]) / self.STEPS_PER_MM), 2),
-                y = round(-(int(data[1]) / self.STEPS_PER_MM), 2),
+                x = round(-(int(data[0]) / self.STEPS_PER_MM), 3),
+                y = round(-(int(data[1]) / self.STEPS_PER_MM), 3),
                 pol = round(int(data[2]) / self.STEPS_PER_DEGREE, 2)
             )
         except:
@@ -517,16 +517,15 @@ class MotorController(MCInterface):
         self.__checkHandshake("MotorController.stopMove", b':', hs)
 
     def getMoveStatus(self) -> MoveStatus:
-        result = MoveStatus(
-            stopSignal = self.stop,
-            timedOut = ((time.time() - self.startTime) > self.timeout) if self.timeout else False
-        )
+        result = MoveStatus(stopSignal = self.stop)
         status = self.getMotorStatus()
         pos = self.getPosition(cached = False)
-        if (not status.inMotion() and pos == self.nextPos):
-            result.success = True
-        elif status.powerFail():
+        if status.powerFail():
             result.powerFail = True
+        elif not status.inMotion() and pos == self.nextPos:
+            result.success = True
+        elif self.timeout and (time.time() - self.startTime) > self.timeout:
+            result.timedOut = True
         return result
 
     def waitForMove(self, timeout: float = None) -> MoveStatus:
