@@ -120,3 +120,8 @@ class MCInterface(ABC):
     @abstractmethod
     def getMoveStatus(self) -> MoveStatus:
         pass
+
+    @abstractmethod
+    def waitForMove(self, timeout: float = None) -> MoveStatus:
+        pass
+    

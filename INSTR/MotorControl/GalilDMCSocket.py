@@ -433,8 +433,8 @@ class MotorController(MCInterface):
         # negate because motors are opposite what we want to call (0,0)
         try:
             self.position = Position(
-                x = round(-(int(data[0]) / self.STEPS_PER_MM), 2),
-                y = round(-(int(data[1]) / self.STEPS_PER_MM), 2),
+                x = round(-(int(data[0]) / self.STEPS_PER_MM), 3),
+                y = round(-(int(data[1]) / self.STEPS_PER_MM), 3),
                 pol = round(int(data[2]) / self.STEPS_PER_DEGREE, 2)
             )
         except:
