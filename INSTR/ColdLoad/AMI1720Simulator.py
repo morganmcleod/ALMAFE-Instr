@@ -69,3 +69,9 @@ class AMI1720Simulator(ColdLoadBase, Singleton):
         :return FillState defined above
         """
         return self.fillState
+
+    def shouldPause(self, 
+            minLevel: float = 55, 
+            maxLevel: float = 110, 
+            enablePause: bool = True) -> tuple[bool, str]:
+        return False, ""
