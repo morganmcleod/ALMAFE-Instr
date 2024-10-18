@@ -27,7 +27,7 @@ class SwitchController():
                  readConfig: SwitchConfig = None, writeConfig: SwitchConfig = None):
         """Constructor
 
-        :param str resource: VISA resource string, defaults to "GPIB0::13::INSTR"
+        :param str resource: VISA resource string, defaults to "GPIB0::9::INSTR"
         :param bool reset: If true, reset the instrument and set default configuration, defaults to True
         """
         self.logger = logging.getLogger("ALMAFE-CTS-Control")
