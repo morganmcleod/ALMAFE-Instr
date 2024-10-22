@@ -5,9 +5,7 @@ from .ColdLoadBase import ColdLoadBase, FillMode, FillState
 class TeragonLC10(ColdLoadBase):
 
     FILL_TIMEOUT = 30
-    POWER_OFF_WAIT = 2
-    RESET_WAIT = 30
-    
+    POWER_ON_WAIT = 30
 
     def __init__(self):
         self.taskMainPower = self._initTask('Dev3/port0/line0', 'outMainPower', False)
@@ -15,14 +13,6 @@ class TeragonLC10(ColdLoadBase):
         self.taskIsFilling = self._initTask('Dev3/port0/line2', 'inIsFilling', True, True)
         self.reset()
 
-    def idQuery(self) -> bool:
-        """Perform an ID query and check compatibility
-
-        :return bool: True if the instrument is compatible with this class.
-        """
-        self.model = "TergaonLC10 LN2 controller"
-        return True
-    
     def reset(self) -> bool:
         """Reset the instrument and set default configuration
 
@@ -32,6 +22,7 @@ class TeragonLC10(ColdLoadBase):
         self.setFillState(FillState.AUTO_OFF)
         self.fillTimeoutAt = None
         self.currentValve = None
+        self.previousValve = None
         return True
 
     def _initTask(self, lines: str, name: str = "", isInput: bool = True, invert: bool = False) -> nidaqmx.Task | None:
@@ -61,6 +52,14 @@ class TeragonLC10(ColdLoadBase):
         self.taskValveSwitch.close()
         self.taskIsFilling.close()
     
+    def idQuery(self) -> bool:
+        """Perform an ID query and check compatibility
+
+        :return bool: True if the instrument is compatible with this class.
+        """
+        self.model = "TergaonLC10 LN2 controller"
+        return True
+    
     def connected(self) -> bool:
         return True
 
@@ -83,8 +82,15 @@ class TeragonLC10(ColdLoadBase):
 
         :return float: Percent
         """
-        return 99.0
-    
+        fillState = self.getFillState
+        if fillState in (FillState.AUTO_ON, FillState.OPEN, FillState.FILLING):
+            if self.taskIsFilling.read():
+                return 50.0
+            else:
+                return 99.0
+        else:
+            return 0.0
+
     def setFillState(self, fillState: FillState) -> None:
         """Set the fill state in a device-dependent way
 
@@ -95,9 +101,9 @@ class TeragonLC10(ColdLoadBase):
             self.taskMainPower.write(True)
             if self.currentValve is None:
                 self.setCurrentValve(1)
-            self.fillTimeoutAt = time.time() + self.FILL_TIMEOUT
+            self.fillTimeoutAt = time.time() + self.POWER_ON_WAIT + self.FILL_TIMEOUT
         else:
-            self.fillState = FillState
+            self.fillState = fillState
             self.taskMainPower.write(False)
     
     def getFillState(self) -> FillState:
@@ -113,8 +119,9 @@ class TeragonLC10(ColdLoadBase):
 
     def setCurrentValve(self, valve: int) -> None:
         if valve in (1, 2):
+            self.previousValve = self.currentValve
             self.currentValve = valve
-            self.taskValveSwitch = bool(valve - 1)
+            self.taskValveSwitch.write(bool(valve - 1))
             return True
         else:
             raise ValueError("TeragonLC10.setCurrentValve: valve must be 1 or 2")
@@ -122,16 +129,17 @@ class TeragonLC10(ColdLoadBase):
     def shouldPause(self, enablePause: bool = True) -> tuple[bool, str]:
         """Should the calling measurement procedure pause and wait for cold load intervention?
 
-        :param bool enablePause: If false generally return True = yes pause, except in error conditions.
+        :param bool enablePause: If True generally return True = yes pause, except in error conditions.
         :return Tuple[bool, str]: Should pause?, and a description of why.
         """
         currentState = self.getFillState()
         if self.fillState == FillState.AUTO_ON and currentState == FillState.FILLING:
             if time.time() > self.fillTimeoutAt:
-                if self.currentValve == 2:
-                    return enablePause, f"Fill timed out at {self.fillTimeoutAt}, state is {currentState.name}, valve is {self.currentValve}"
+                if self.currentValve is not None and self.previousValve is not None:
+                    self.stopFill()
+                    return enablePause, f"Fill timed out after {self.FILL_TIMEOUT} seconds, state is {currentState.name}, valve is {self.currentValve}"
                 else:
-                    self.setCurrentValve(2)
+                    self.setCurrentValve(3 - self.currentValve)
                     self.fillTimeoutAt = time.time() + self.FILL_TIMEOUT
                     return False, "Switched to valve 2."
         return False, ""
