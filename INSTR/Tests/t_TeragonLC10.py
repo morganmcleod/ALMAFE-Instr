@@ -6,7 +6,7 @@ coldLoad.idQuery()
 print(coldLoad.model)
 
 def display():
-    print(f"fill mode: {coldLoad.getFillMode()}, fill state: {coldLoad.getFillState()}, valve: {coldLoad.currentValve}")
+    print(f"{coldLoad.getFillMode()}, {coldLoad.getFillState()}, valve: {coldLoad.currentValve}, level: {coldLoad.getLevel()}")
 
 coldLoad.stopFill()
 display()

@@ -4,7 +4,7 @@ from .ColdLoadBase import ColdLoadBase, FillMode, FillState
 
 class TeragonLC10(ColdLoadBase):
 
-    FILL_TIMEOUT = 30
+    FILL_TIMEOUT = 20 * 60
     POWER_ON_WAIT = 30
 
     def __init__(self):
@@ -82,12 +82,12 @@ class TeragonLC10(ColdLoadBase):
 
         :return float: Percent
         """
-        fillState = self.getFillState
+        fillState = self.getFillState()
         if fillState in (FillState.AUTO_ON, FillState.OPEN, FillState.FILLING):
             if self.taskIsFilling.read():
                 return 50.0
             else:
-                return 99.0
+                return 90.0
         else:
             return 0.0
 
