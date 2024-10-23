@@ -11,7 +11,7 @@ class YIGFilter():
     def __init__(self, resource="GPIB0::9::INSTR", simulate = False):
         """Constructor
 
-        :param str resource: VISA resource string, defaults to "GPIB0::13::INSTR"
+        :param str resource: VISA resource string, defaults to "GPIB0::9::INSTR"
         """
         self.simulate = simulate
         if simulate:

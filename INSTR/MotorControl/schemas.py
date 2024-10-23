@@ -42,9 +42,9 @@ class Position(BaseModel):
     def __eq__(self, other) -> bool:
         if not other:
             return False
-        return self.x == other.x and \
-            self.y == other.y and \
-            abs(self.pol - other.pol) < 0.2
+        return abs(self.x - other.x) < 0.005 and \
+               abs(self.y - other.y) < 0.005 and \
+               abs(self.pol - other.pol) < 0.2
 
     def calcMove(self, dest):
         return Position(x = self.x - dest.x,

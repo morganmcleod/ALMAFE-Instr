@@ -12,7 +12,7 @@ class SignalGenerator(SignalGenInterface):
     def __init__(self, resource="GPIB0::19::INSTR", idQuery=True, reset=True):
         """Constructor
 
-        :param str resource: VISA resource string, defaults to "GPIB0::13::INSTR"
+        :param str resource: VISA resource string, defaults to "GPIB0::19::INSTR"
         :param bool idQuery: If true, perform an ID query and check compatibility, defaults to True
         :param bool reset: If true, reset the instrument and set default configuration, defaults to True
         """
