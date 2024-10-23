@@ -1,3 +1,4 @@
+import logging
 from INSTR.Common.RemoveDelims import removeDelims
 from ALMAFE.basic.Units import Units
 from .schemas import Channel, Trigger, StdErrConfig, StdErrResult
@@ -17,6 +18,8 @@ class PowerMeter(BaseE441X):
         :param bool idQuery: If true, perform an ID query and check compatibility, defaults to True
         :param bool reset: If true, reset the instrument and set default configuration, defaults to True
         """
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"KeysightE441X created at {resource}")
         super().__init__(resource, idQuery, reset)
         self.settings = {Channel.A : {}, Channel.B: {}}
         self.setDefaults()
@@ -31,6 +34,7 @@ class PowerMeter(BaseE441X):
             ok = self.setFastMode(False)
         if ok:
             ok = self.disableAveraging()
+        self.initContinuous()
         return ok
 
     def setTimeout(self, timeoutMs: int = None):

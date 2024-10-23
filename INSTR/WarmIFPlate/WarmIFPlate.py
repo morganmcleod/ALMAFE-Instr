@@ -1,5 +1,10 @@
+import logging
+
 class WarmIFPlate():
     def __init__(self, attenuator, inputSwitch, noiseSource, outputSwitch, yigFilter):
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"WarmIFPlate created")
+    
         self.attenuator = attenuator
         self.inputSwitch = inputSwitch
         self.noiseSource = noiseSource
@@ -15,7 +20,7 @@ class WarmIFPlate():
         reason += f"YIG filter:{'OK' if self.yigFilter.connected() else 'ERROR'}"
         return {
             "name": "Warm IF Plate",
-            "resource": self.resource,
+            "resource": "",
             "connected": self.connected(),
             "reason": reason
         }             

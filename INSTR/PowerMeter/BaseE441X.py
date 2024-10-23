@@ -20,7 +20,7 @@ class BaseE441X():
         :param bool idQuery: If true, perform an ID query and check compatibility, defaults to True
         :param bool reset: If true, reset the instrument and set default configuration, defaults to True
         """
-        self.logger = logging.getLogger("ALMAFE-CTS-Control")
+        self.logger = logging.getLogger("ALMAFE-Instr")
         self.twoChannel = False
         self.inst = VisaInstrument(resource, timeout = self.DEFAULT_TIMEOUT)
         if self.inst.connected and self.inst.inst.interface_type == pyvisa.constants.InterfaceType.asrl:
@@ -73,6 +73,13 @@ class BaseE441X():
             self.logger.debug(mfr + " " + model + (", two channel" if self.twoChannel else ", one channel"))
             return True
         return False
+
+    def deviceInfo(self) -> dict:
+        return {
+            "name": "E441X Power Meter",
+            "resource": self.inst.resource,
+            "connected": self.connected()
+        }
 
     def reset(self):
         """Reset the instrument and set default configuration

@@ -1,3 +1,4 @@
+import logging
 from .Interface import InputSwitch_Interface, InputSelect
 from INSTR.SwitchController.HP3488a import SwitchController, SwitchConfig, DigitalPort
 
@@ -17,6 +18,11 @@ class InputSwitch(InputSwitch_Interface):
 
         :param str resource: VISA resource string, defaults to "GPIB0::9::INSTR"
         """
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        if simulate:
+            self.logger.info(f"InputSwitch simulator created")
+        else:
+            self.logger.info(f"InputSwitch created at {resource}")
         self.simulate = simulate
         self.resource = "simulated" if simulate else resource
         if simulate:

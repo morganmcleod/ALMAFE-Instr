@@ -9,7 +9,7 @@ class test_GalilDMCSocket(unittest.TestCase):
 
     def setUp(self) -> None:
         self.mc = MotorController()
-        self.logger = logging.getLogger("ALMAFE-CTS-Control")
+        self.logger = logging.getLogger("ALMAFE-Instr")
         self.logger.setLevel(logging.DEBUG)
         return super().setUp()
 

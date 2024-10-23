@@ -1,5 +1,6 @@
-from INSTR.SwitchController.Agilent11713 import AttenuatorSwitchController
 import copy
+import logging
+from INSTR.SwitchController.Agilent11713 import AttenuatorSwitchController
 
 class Attenuator():
     MAX_ATTENUATION = 121
@@ -12,6 +13,11 @@ class Attenuator():
         :param str resource: VISA resource string, defaults to "GPIB0::9::INSTR"
         """
         # don't reset here because that would set attenuation to 0:
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        if simulate:
+            self.logger.info(f"Attenuator simulator created")
+        else:
+            self.logger.info(f"Attenuator created at {resource}")
         self.simulate = simulate
         if simulate:
             self.switchController = None

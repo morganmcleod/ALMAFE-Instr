@@ -1,3 +1,4 @@
+import logging
 from enum import Enum
 from INSTR.Common.RemoveDelims import removeDelims
 from INSTR.Common.VisaInstrument import VisaInstrument
@@ -28,6 +29,8 @@ class CurrentSource():
     DEFAULT_TIMEOUT = 15000     # milliseconds
 
     def __init__(self, resource="GPIB0::25::INSTR", idQuery=True, reset=True):
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"Keithly 24XX created at {resource}")
         self.mfr = None
         self.model = None
         self.inst = VisaInstrument(resource, timeout = self.DEFAULT_TIMEOUT)

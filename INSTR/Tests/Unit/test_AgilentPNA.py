@@ -9,7 +9,7 @@ class test_AgilentPNA(unittest.TestCase):
     DO_PRINT = False
 
     def setUp(self):        
-        self.logger = logging.getLogger("ALMAFE-CTS-Control")
+        self.logger = logging.getLogger("ALMAFE-Instr")
         self.pna = AgilentPNA()
         # clear any previous errors:
         self.__implErrorQuery()

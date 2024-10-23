@@ -1,3 +1,4 @@
+import logging
 from typing import Sequence
 
 from INSTR.Common.VisaInstrument import VisaInstrument
@@ -15,6 +16,8 @@ class AttenuatorSwitchController():
         :param bool idQuery: If true, perform an ID query and check compatibility, defaults to True
         :param bool reset: If true, reset the instrument and set default configuration, defaults to True
         """
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"Agilent11713 created at {resource}")        
         self.inst = VisaInstrument(resource, timeout = self.DEFAULT_TIMEOUT)
         if reset:
             self.reset()

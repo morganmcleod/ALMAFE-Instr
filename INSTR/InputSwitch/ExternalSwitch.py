@@ -1,4 +1,4 @@
-
+import logging
 from .Interface import InputSwitch_Interface, InputSelect
 from INSTR.SwitchController.Agilent11713 import AttenuatorSwitchController
 
@@ -9,6 +9,11 @@ class ExternalSwitch(InputSwitch_Interface):
 
         :param str resource: VISA resource string,
         """
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        if simulate:
+            self.logger.info(f"ExternalSwitch simulator created")
+        else:
+            self.logger.info(f"ExternalSwitch created at {resource}")
         self.simulate = simulate
         self.resource = "simulated" if simulate else resource
         if simulate:

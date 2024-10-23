@@ -1,5 +1,6 @@
 import unittest
-from INSTR.PowerMeter.BaseE441X import Channel, Trigger, Units
+from ALMAFE.basic.Units import Units
+from INSTR.PowerMeter.BaseE441X import Channel, Trigger
 from INSTR.PowerMeter.KeysightE441X import PowerMeter, StdErrConfig
 import logging
 
@@ -8,7 +9,7 @@ class test_PowerMeter(unittest.TestCase):
     DO_PRINT = False
     
     def setUp(self):
-        self.logger = logging.getLogger("ALMAFE-CTS-Control")
+        self.logger = logging.getLogger("ALMAFE-Instr")
         self.pm = PowerMeter()
         self.pm.twoChannel = False
         
@@ -40,10 +41,10 @@ class test_PowerMeter(unittest.TestCase):
         self.assertFalse(self.__implErrorQuery())
 
     def test_setUnits(self):
-        self.assertTrue(self.pm.setUnits(Units.W, Channel.A))
+        self.assertTrue(self.pm.setUnits(Units.WATTS, Channel.A))
         self.assertTrue(self.pm.setUnits(Units.DBM, Channel.A))
         if self.pm.twoChannel:
-            self.assertTrue(self.pm.setUnits(Units.W, Channel.B))
+            self.assertTrue(self.pm.setUnits(Units.WATTS, Channel.B))
             self.assertTrue(self.pm.setUnits(Units.DBM, Channel.B))
 
     def test_setFastMode(self):
@@ -55,7 +56,7 @@ class test_PowerMeter(unittest.TestCase):
 
     # def test_zero(self):
     #     self.assertTrue(self.pm.zero(Channel.A))
-    #     if self.pm.twoChannel:
+    #     if self.pm.twoChannel:,
     #         self.assertTrue(self.pm.zero(Channel.B))
 
     def test_setOutputRef(self):

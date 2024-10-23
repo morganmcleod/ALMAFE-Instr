@@ -1,3 +1,4 @@
+import logging
 from .schemas import Channel, Trigger, StdErrConfig, StdErrResult
 from ALMAFE.basic.Units import Units
 from time import time
@@ -7,6 +8,8 @@ from math import sqrt
 class PowerMeterSimulator():
 
     def __init__(self):
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"PowerMeterSimulator created")
         self.settings = {Channel.A : {}, Channel.B: {}}
         self.setDefaults()
         

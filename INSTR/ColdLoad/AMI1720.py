@@ -1,24 +1,24 @@
-from pyvisa.constants import BufferOperation
 import logging
+import re
+from threading import Lock
+from pyvisa.constants import BufferOperation
 from INSTR.Common.RemoveDelims import removeDelims
 from INSTR.Common.VisaInstrument import VisaInstrument
 from .ColdLoadBase import ColdLoadBase, FillMode, FillState
-from Util.Singleton import Singleton
-from threading import Lock
-import re
 
-class AMI1720(ColdLoadBase, Singleton):
+class AMI1720(ColdLoadBase):
 
     DEFAULT_TIMEOUT = 2500
     
-    def init(self, resource="TCPIP0::10.1.1.5::7180::SOCKET", idQuery=True, reset=True):
+    def __init__(self, resource="TCPIP0::10.1.1.5::7180::SOCKET", idQuery=True, reset=True):
         """Constructor
 
         :param str resource: VISA resource string, defaults to "TCPIP0::169.254.1.5::7180::SOCKET"
         :param bool idQuery: If true, perform an ID query and check compatibility, defaults to True
         :param bool reset: If true, reset the instrument and set default configuration, defaults to True
         """
-        self.logger = logging.getLogger("ALMAFE-CTS-Control")
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"AMI1720 created at {resource}")
         self.lock = Lock()
         self.inst = VisaInstrument(
             resource, 

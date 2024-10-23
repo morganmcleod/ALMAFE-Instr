@@ -20,7 +20,8 @@ class MCSimulator(MCInterface):
     POL_INIT = -100
     
     def __init__(self):
-        self.logger = logging.getLogger("ALMAFE-CTS-Control")
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"MCSimulator created")
         self.start = False
         self.stop = False
         self.xySpeed = self.XY_SPEED

@@ -3,17 +3,16 @@ import logging
 import serial
 from enum import Enum
 from INSTR.Common.RemoveDelims import removeDelims
-from INSTR.Common.Singleton import Singleton
 from .Interface import Chopper_Interface, ChopperState
 
-class Chopper(Singleton, Chopper_Interface):
+class Chopper(Chopper_Interface):
     """The band 6 chopper is based on an Intelligent Motion Systems Panther LE2 stepper motor controller.
     There are reflective tape marks on the chopper wheel so that the half-clock (HC) and full-clock (FC)
     positions can be sensed, for homing and for reporting its current position.
     Monitor and control is via RS232. The CTS and DSR lines are used as digital inputs for the HC and FC signals.
     """
 
-    def init(self, resource="COM1", openIsHot: bool = True, simulate: bool = False):
+    def __init__(self, resource="COM1", openIsHot: bool = True, simulate: bool = False):
         """Constructor
 
         :param str resource: serial port to use, defaults to "COM1"
@@ -22,7 +21,8 @@ class Chopper(Singleton, Chopper_Interface):
         """
         self._openIsHot = openIsHot
         self.simulate = simulate
-        self.logger = logging.getLogger("ALMAFE-CTS-Control")
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"Band 6 Chopper created at {resource}")
         self.spinning = False        
         try:
             self.inst = serial.Serial(

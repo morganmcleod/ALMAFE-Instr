@@ -10,7 +10,8 @@ class VoltMeterSimulator():
         """Constructor
 
         """
-        self.logger = logging.getLogger("ALMAFE-CTS-Control")
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"VoltMeterSimulator created")
 
     def idQuery(self) -> bool:
         """Perform an ID query and check compatibility

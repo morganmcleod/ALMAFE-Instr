@@ -47,7 +47,8 @@ class MotorController(MCInterface):
     MAX_POL_TORQUE = 9.9982         # "
 
     def __init__(self, host = DEFAULT_HOST, port = DEFAULT_PORT):
-        self.logger = logging.getLogger("ALMAFE-CTS-Control")
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"GalilDMCSocket created at {host}:{port}")
         self.logger.setLevel(logging.DEBUG)        
         self.host = host
         self.port = port

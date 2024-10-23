@@ -7,7 +7,7 @@ class test_Lakeshore218(unittest.TestCase):
     DO_PRINT = False
 
     def setUp(self):        
-        self.logger = logging.getLogger("ALMAFE-CTS-Control")
+        self.logger = logging.getLogger("ALMAFE-Instr")
         self.inst = TemperatureMonitor()
         time.sleep(0.2)
                 

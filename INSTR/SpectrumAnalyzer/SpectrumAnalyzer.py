@@ -1,6 +1,7 @@
+import logging
+import time
 from .BaseMXA import BaseMXA
 from .schemas import *
-import time
 
 class SpectrumAnalyzer(BaseMXA):
 
@@ -11,6 +12,8 @@ class SpectrumAnalyzer(BaseMXA):
         :param bool idQuery: If true, perform an ID query and check compatibility, defaults to True
         :param bool reset: If true, reset the instrument and set default configuration, defaults to True
         """
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"SpectrumAnalyzer created at {resource}")
         super().__init__(resource, idQuery, reset)
         self.settings = SpectrumAnalyzerSettings()
         self.isNarrowBand = False

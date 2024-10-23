@@ -3,3 +3,5 @@ pyvisa>=1.12.0
 pyserial>=3.5
 nidaqmx>=1.0.1
 ALMAFE-Lib>=0.0.16
+numpy==1.26.4
+

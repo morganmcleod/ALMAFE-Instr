@@ -6,7 +6,8 @@ class TemperatureMonitorSimulator():
     SIM_ERRS = [0, 0, 0, 0, 0, 0, 0, 0]
 
     def __init__(self):
-        self.logger = logging.getLogger("ALMAFE-CTS-Control")
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"TemperatureMonitorSimulator created")
 
     def connected(self) -> bool:
         return True

@@ -1,6 +1,7 @@
-from INSTR.SwitchController.HP3488a import SwitchController, SwitchConfig, DigitalPort, DigitalMethod
 from enum import Enum
+import logging
 import time
+from INSTR.SwitchController.HP3488a import SwitchController, SwitchConfig, DigitalPort, DigitalMethod
 
 class PadSelect(Enum):
     PAD_OUT = 0
@@ -20,6 +21,11 @@ class OutputSwitch():
 
         :param str resource: VISA resource string, defaults to "GPIB0::9::INSTR"
         """
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        if simulate:
+            self.logger.info(f"OutputSwitch simulator created")
+        else:
+            self.logger.info(f"OutputSwitch created at {resource}")        
         self.simulate = simulate
         if simulate:
             self.switchController = None
