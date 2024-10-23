@@ -168,3 +168,34 @@ class AMI1720(ColdLoadBase, Singleton):
             return state
         else:
             return FillState.UNKNOWN
+
+    def shouldPause(self, 
+            minLevel: float = 55, 
+            maxLevel: float = 110, 
+            enablePause: bool = True) -> tuple[bool, str]:
+        """Should the calling measurement procedure pause and wait for cold load intervention?
+
+        :param float minLevel: Percent
+        :param float maxLevel: Percent
+            This is intended to catch very out-of-range readings from sensor problems.
+        :param bool enablePause: If false generally return True = yes pause, except in error conditions.
+        :return Tuple[bool, str]: Should pause?, and a description of why.
+        """
+        
+        state = self.getFillState()
+        level = self.getLevel()
+        
+        if state in (FillState.AUTO_OFF, FillState.AUTO_ON, FillState.FILLING, FillState.CLOSED, FillState.TIMEOUT):
+            if level < minLevel or level > maxLevel:
+                return enablePause, f"state is {state.name}, level is {level:.1f}%"
+            else:
+                return False, ""
+        
+        elif state == FillState.OPEN:
+            if level < minLevel:
+                return enablePause, f"state is {state.name}, level is {level:.1f}%"
+            else:
+                return False, ""
+        
+        else:
+            return True, f"unsupported state {state.name}, level is {level:.1f}%"
