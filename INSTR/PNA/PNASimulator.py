@@ -1,3 +1,4 @@
+import logging
 from .schemas import *
 from .PNAInterface import *
 from typing import Tuple, List, Optional
@@ -7,7 +8,8 @@ from math import log10, pi, sqrt, atan2, exp, sin
 class PNASimulator(PNAInterface):
 
     def __init__(self, *args, **kwargs):
-        pass
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"PNASimulator created")
     
     def idQuery(self)-> Optional[str]:
         """Perform an ID query and check compatibility

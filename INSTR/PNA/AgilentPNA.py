@@ -53,7 +53,8 @@ class AgilentPNA(BaseAgilentPNA):
         :param bool idQuery: If true, perform an ID query and check compatibility, defaults to True
         :param bool reset: If true, reset the instrument and set default configuration, defaults to True
         """
-        self.logger = logging.getLogger("ALMAFE-CTS-Control")
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"AgilentPNA created at {resource}")
         self.measConfig = None
         self.powerConfig = None
         super().__init__(resource, idQuery, reset)

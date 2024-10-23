@@ -1,7 +1,10 @@
+import logging
 
 class PowerSupplySimulator():
     
     def __init__(self):
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"PowerSupplySimulator created")
         self.voltage = {}
         self.current = {}
     

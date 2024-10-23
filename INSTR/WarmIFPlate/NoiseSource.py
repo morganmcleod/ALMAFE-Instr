@@ -1,8 +1,14 @@
+import logging
 from INSTR.PowerSupply.AgilentE363xA import PowerSupply
 
 class NoiseSource():
     """Noise diode implemented in terms of a Agilent E363xA power supply"""
     def __init__(self, resource = "GPIB0::5::INSTR", simulate = False):
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        if simulate:
+            self.logger.info(f"NoiseSource simulator created")
+        else:
+            self.logger.info(f"NoiseSource created at {resource}")
         self.simulate = simulate
         if simulate:
             self.powerSupply = None
@@ -17,12 +23,12 @@ class NoiseSource():
             self.powerSupply.setVoltage(28)
 
     def connected(self) -> bool:
-        if simulate:
+        if self.simulate:
             return True
         else:
             return self.powerSupply.connected()
 
     def setEnable(self, enable: bool = False) -> None:
-        if not simulate:
+        if not self.simulate:
             self.powerSupply.setOutputEnable(enable)
 

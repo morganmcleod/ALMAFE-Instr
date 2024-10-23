@@ -8,7 +8,8 @@ class SpectrumAnalyzerSimulator():
     """
 
     def __init__(self,  idQuery=True, reset=True) -> None:
-        self.logger = logging.getLogger("ALMAFE-CTS-Control")
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"SpectrumAnalyzerSimulator created")
         self.mfr = None
         self.model = None
         ok = self.connected()

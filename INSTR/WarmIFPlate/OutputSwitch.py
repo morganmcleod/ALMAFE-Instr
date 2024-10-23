@@ -1,6 +1,7 @@
-from INSTR.SwitchController.HP3488a import SwitchController, SwitchConfig, DigitalPort, DigitalMethod
 from enum import Enum
+import logging
 import time
+from INSTR.SwitchController.HP3488a import SwitchController, SwitchConfig, DigitalPort, DigitalMethod
 
 class PadSelect(Enum):
     PAD_OUT = 0
@@ -20,6 +21,11 @@ class OutputSwitch():
 
         :param str resource: VISA resource string, defaults to "GPIB0::9::INSTR"
         """
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        if simulate:
+            self.logger.info(f"OutputSwitch simulator created")
+        else:
+            self.logger.info(f"OutputSwitch created at {resource}")        
         self.simulate = simulate
         if simulate:
             self.switchController = None
@@ -44,7 +50,15 @@ class OutputSwitch():
                        load: LoadSelect = LoadSelect.THROUGH,
                        pad: PadSelect = PadSelect.PAD_OUT) -> None:
         if not self.simulate:
-            # send the compliment of the byte having the selected bits:
-            self.switchController.staticWrite(255)
-            time.sleep(0.2)
-            self.switchController.staticWrite(255 - (output.value + load.value + pad.value))
+            # doing an extra toggle here because the swtich driver can be flaky
+            toSend = [
+                255,
+                255 - (OutputSelect.SQUARE_LAW.value + load.value + pad.value),
+                255 - (OutputSelect.POWER_METER.value + load.value + pad.value),
+            ]
+            if output == OutputSelect.SQUARE_LAW:
+                toSend[1], toSend[2] = toSend[2], toSend[1]
+            for b in toSend:
+                self.switchController.staticWrite(b)
+                time.sleep(0.2)
+

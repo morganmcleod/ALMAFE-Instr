@@ -30,7 +30,8 @@ class SwitchController():
         :param str resource: VISA resource string, defaults to "GPIB0::9::INSTR"
         :param bool reset: If true, reset the instrument and set default configuration, defaults to True
         """
-        self.logger = logging.getLogger("ALMAFE-CTS-Control")
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"HP3488a created at {resource}")
         self.inst = VisaInstrument(resource, timeout = self.DEFAULT_TIMEOUT)        
         if readConfig:
             self.readConfig = readConfig

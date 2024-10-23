@@ -1,19 +1,19 @@
-from .ColdLoadBase import ColdLoadBase, FillMode, FillState
-from Util.Singleton import Singleton
 from typing import Tuple
-import time
+import logging
+from .ColdLoadBase import ColdLoadBase, FillMode, FillState
 
-class AMI1720Simulator(ColdLoadBase, Singleton):
+class AMI1720Simulator(ColdLoadBase):
 
     DEFAULT_TIMEOUT = 2500
     
-    def __init__(self, resource="TCPIP0::169.254.1.5::7180::SOCKET", idQuery=True, reset=True):
+    def __init__(self, idQuery=True, reset=True):
         """Constructor
 
-        :param str resource: VISA resource string, defaults to "TCPIP0::169.254.1.5::7180::SOCKET"
         :param bool idQuery: If true, perform an ID query and check compatibility, defaults to True
         :param bool reset: If true, reset the instrument and set default configuration, defaults to True
         """
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"AMI1720 Simulator created")
         self.setFillMode(FillMode.NORMAL)
         self.fillState = FillState.CLOSED
 

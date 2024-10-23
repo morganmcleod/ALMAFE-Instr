@@ -1,3 +1,4 @@
+import logging
 from .Interface import SignalGenInterface
 
 class SignalGenSimulator(SignalGenInterface):
@@ -5,6 +6,8 @@ class SignalGenSimulator(SignalGenInterface):
     def __init__(self, reset=True):
         """Constructor
         """
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"SignalGenSimulator created")
         if reset:
             self.reset()
 

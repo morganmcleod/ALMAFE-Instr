@@ -1,3 +1,4 @@
+import logging
 import time
 import nidaqmx
 from .ColdLoadBase import ColdLoadBase, FillMode, FillState
@@ -8,6 +9,8 @@ class TeragonLC10(ColdLoadBase):
     POWER_ON_WAIT = 30
 
     def __init__(self):
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"TeragonLC10 created ")
         self.taskMainPower = self._initTask('Dev3/port0/line0', 'outMainPower', False)
         self.taskValveSwitch = self._initTask('Dev3/port0/line1', 'outValveSwitch', False)
         self.taskIsFilling = self._initTask('Dev3/port0/line2', 'inIsFilling', True, True)

@@ -1,3 +1,4 @@
+import logging
 from INSTR.SwitchController.HP3488a import SwitchController, SwitchConfig, DigitalPort, DigitalMethod
 
 class YIGFilter():
@@ -13,6 +14,11 @@ class YIGFilter():
 
         :param str resource: VISA resource string, defaults to "GPIB0::9::INSTR"
         """
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        if simulate:
+            self.logger.info(f"YIGFilter simulator created")
+        else:
+            self.logger.info(f"YIGFilter created at {resource}")
         self.simulate = simulate
         if simulate:
             self.SwitchController = None

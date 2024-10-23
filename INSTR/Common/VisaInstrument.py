@@ -7,7 +7,7 @@ class VisaInstrument():
             resource: str,
             max_errors: int = 5,            
             **kwargs: Any):
-        self.logger = logging.getLogger("ALMAFE-CTS-Control")
+        self.logger = logging.getLogger("ALMAFE-Instr")
         rm = pyvisa.ResourceManager()
         self.resource = resource
         try:

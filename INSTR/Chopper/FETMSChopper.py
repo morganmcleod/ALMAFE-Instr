@@ -1,11 +1,13 @@
+import logging
 import time
 import nidaqmx
-from INSTR.Common.Singleton import Singleton
 from .Interface import Chopper_Interface, ChopperState
 
-class Chopper(Chopper_Interface, Singleton):
+class Chopper(Chopper_Interface):
 
-    def init(self, openIsHot: bool = False, simulate: bool = False):
+    def __init__(self, openIsHot: bool = False, simulate: bool = False):
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"FETMS Chopper created")
         self._openIsHot = openIsHot
         self.simulate = simulate
         if not simulate:        

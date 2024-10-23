@@ -1,3 +1,4 @@
+import logging
 from INSTR.Common.RemoveDelims import removeDelims
 from ALMAFE.basic.Units import Units
 from .schemas import Channel, Trigger, StdErrConfig, StdErrResult
@@ -17,10 +18,17 @@ class PowerMeter(BaseE441X):
         :param bool idQuery: If true, perform an ID query and check compatibility, defaults to True
         :param bool reset: If true, reset the instrument and set default configuration, defaults to True
         """
-        super().__init__(resource, idQuery, reset)
+        self.logger = logging.getLogger("ALMAFE-Instr")
+        self.logger.info(f"KeysightE441X created at {resource}")
+        super().__init__(resource, idQuery, False)
+        if reset:
+            self.reset()
+        
+    def reset(self):
+        super().reset()
         self.settings = {Channel.A : {}, Channel.B: {}}
         self.setDefaults()
-        
+
     def setDefaults(self):
         """Set instrument defaults so that the front panel shows live readings
 
@@ -31,6 +39,7 @@ class PowerMeter(BaseE441X):
             ok = self.setFastMode(False)
         if ok:
             ok = self.disableAveraging()
+        self.initContinuous()
         return ok
 
     def setTimeout(self, timeoutMs: int = None):
@@ -77,7 +86,7 @@ class PowerMeter(BaseE441X):
         opc = removeDelims(self.inst.query("*OPC?"))
         return opc and opc[0]
     
-    def disableAveraging(self, channel = None):
+    def disableAveraging(self, channel = None, calFreq = 6):
         """Set the display to show both channels, if applicable, turns off averaging and sets the CW frequency to 6 GHz
 
         :param Channel channel: which channel to configure, defaults to None which configures both channels if supported
@@ -86,16 +95,35 @@ class PowerMeter(BaseE441X):
         if not channel or channel == Channel.A:
             self.configMeasurement(Channel.A, units = self.settings[Channel.A].get('units', Units.DBM))
             self.inst.write("SENS1:AVER:STAT 0;")
-            self.inst.write("SENS1:FREQ:CW 6E9;")
+            self.inst.write(f"SENS1:FREQ:CW {calFreq}E9;")
             self.initContinuous(True, Channel.A)
         if (not channel or channel == Channel.B) and self.twoChannel:
             self.configMeasurement(Channel.B, units = self.settings[Channel.B].get('units', Units.DBM))
             self.inst.write("SENS2:AVER:STAT 0;")
-            self.inst.write("SENS2:FREQ:CW 6E9;")
+            self.inst.write(f"SENS2:FREQ:CW {calFreq}E9;")
             self.initContinuous(True, Channel.B)
         opc = removeDelims(self.inst.query("*OPC?"))
         return opc and opc[0]
 
+    def enableAveraging(self, channel = None, calFreq = 6):
+        """Set the display to show both channels, if applicable, turns on averaging and sets the CW frequency to 6 GHz
+
+        :param Channel channel: which channel to configure, defaults to None which configures both channels if supported
+        :return bool: True if instrument responed to Operation Complete query
+        """
+        if not channel or channel == Channel.A:
+            self.configMeasurement(Channel.A, units = self.settings[Channel.A].get('units', Units.DBM))
+            self.inst.write("SENS1:AVER:STAT 1;")
+            self.inst.write(f"SENS1:FREQ:CW {calFreq}E9;")
+            self.initContinuous(True, Channel.A)
+        if (not channel or channel == Channel.B) and self.twoChannel:
+            self.configMeasurement(Channel.B, units = self.settings[Channel.B].get('units', Units.DBM))
+            self.inst.write("SENS2:AVER:STAT 1;")
+            self.inst.write(f"SENS2:FREQ:CW {calFreq}E9;")
+            self.initContinuous(True, Channel.B)
+        opc = removeDelims(self.inst.query("*OPC?"))
+        return opc and opc[0]
+    
     def autoRead(self, channel = Channel.A):
         """Perform an auto-read which takes as long as needed to get (typically) three digits of resolution
         
