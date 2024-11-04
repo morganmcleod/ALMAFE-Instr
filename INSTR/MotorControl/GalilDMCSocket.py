@@ -25,8 +25,6 @@ class QueueItem(BaseModel):
 class MotorController(MCInterface):
     SOCKET_TIMEOUT = 2    # sec
     RECV_BYTE_TIMEOUT = 0.005
-    STEPS_PER_DEGREE = 225
-    STEPS_PER_MM = 5000
     X_MIN = 0
     Y_MIN = 0
     X_MAX = 400
@@ -55,7 +53,15 @@ class MotorController(MCInterface):
         self.socket = None
         self.queue = queue.SimpleQueue()
         threading.Thread(target = self.queueWorker, daemon=True).start()
+        self.setStepping()
         self.reset()
+
+    def setStepping(self,
+                steps_per_mm: int = 5000,
+                steps_per_degree: float = 166.666666667
+            ):
+        self.steps_per_mm = steps_per_mm
+        self.steps_per_degre = steps_per_degree
 
     def __del__(self):
         try:
@@ -188,7 +194,7 @@ class MotorController(MCInterface):
         '''
         speed: mm/second
         '''
-        speedSteps = speed * self.STEPS_PER_MM
+        speedSteps = speed * self.steps_per_mm
         assert(self.MIN_XYSPEED_STEPS < speed < self.MAX_XYSPEED_STEPS)
         self.xySpeed = speed
         hs = self.query(f"SP {speedSteps}, {speedSteps};")
@@ -196,7 +202,7 @@ class MotorController(MCInterface):
         self.__setVectorSpeed(speed)
 
     def __setVectorSpeed(self, speed:float):
-        speedSteps = speed * self.STEPS_PER_MM
+        speedSteps = speed * self.steps_per_mm
         hs = self.query(f"VS {speedSteps};")
         self.__checkHandshake("MotorController.__setVectorSpeed", b':', hs)
 
@@ -210,14 +216,14 @@ class MotorController(MCInterface):
         data = removeDelims(data, self.DELIMS)
         speed = int(data[0])
         assert(self.MIN_XYSPEED_STEPS < speed < self.MAX_XYSPEED_STEPS)
-        speed = float(speed / self.STEPS_PER_MM)
+        speed = float(speed / self.steps_per_mm)
         return speed
 
     def setXYAccel(self, accel:float):
         '''
         accel mm/sec^2
         '''
-        accel *= self.STEPS_PER_MM
+        accel *= self.steps_per_mm
         assert(self.MIN_ACCEL_STEPS < accel < self.MAX_ACCEL_STEPS)
         hs = self.query(f"AC {accel}, {accel};")
         self.__checkHandshake("MotorController.setXYAccel", b':', hs)
@@ -230,14 +236,14 @@ class MotorController(MCInterface):
         data = removeDelims(data, self.DELIMS)
         accel = int(data[0])
         assert(self.MIN_ACCEL_STEPS < accel < self.MAX_ACCEL_STEPS)
-        accel = float(accel / self.STEPS_PER_MM)
+        accel = float(accel / self.steps_per_mm)
         return accel
 
     def setXYDecel(self, decel:float):
         '''
         decel mm/sec^2
         '''
-        decel *= self.STEPS_PER_MM
+        decel *= self.steps_per_mm
         assert(self.MIN_ACCEL_STEPS <= decel <= self.MAX_ACCEL_STEPS)
         hs = self.query(f"DC {decel}, {decel};")
         self.__checkHandshake("MotorController.setXYDecel", b':', hs)
@@ -250,7 +256,7 @@ class MotorController(MCInterface):
         data = removeDelims(data, self.DELIMS)
         decel = int(data[0])
         assert(self.MIN_ACCEL_STEPS < decel < self.MAX_ACCEL_STEPS)
-        decel = float(decel / self.STEPS_PER_MM)
+        decel = float(decel / self.steps_per_mm)
         return decel
 
     def setPolSpeed(self, speed:float):
@@ -258,7 +264,7 @@ class MotorController(MCInterface):
         speed: degrees/second
         '''
         self.polSpeed = speed
-        speed *= self.STEPS_PER_DEGREE
+        speed *= self.steps_per_degree
         assert(self.MIN_POLSPEED_STEPS <= speed <= self.MAX_POLSPEED_STEPS)
         hs = self.query(str.encode(f"SPC={speed};"))
         self.__checkHandshake("MotorController.setPolSpeed", b':', hs)
@@ -271,14 +277,14 @@ class MotorController(MCInterface):
         data = removeDelims(data, self.DELIMS)
         speed = int(data[2])
         assert(self.MIN_POLSPEED_STEPS < speed < self.MAX_POLSPEED_STEPS)
-        speed = float(speed / self.STEPS_PER_DEGREE)
+        speed = float(speed / self.steps_per_degree)
         return speed
 
     def setPolAccel(self, accel:float):
         '''
         accel: deg/sec^2
         '''
-        accel *= self.STEPS_PER_DEGREE
+        accel *= self.steps_per_degree
         assert(self.MIN_ACCEL_STEPS <= accel <= self.MAX_ACCEL_STEPS)
         hs = self.query(f"ACC={accel};")
         self.__checkHandshake("MotorController.setPolAccel", b':', hs)
@@ -291,14 +297,14 @@ class MotorController(MCInterface):
         data = removeDelims(data, self.DELIMS)
         accel = int(data[2])
         assert(self.MIN_ACCEL_STEPS < accel < self.MAX_ACCEL_STEPS)
-        accel = float(accel / self.STEPS_PER_DEGREE)
+        accel = float(accel / self.steps_per_degree)
         return accel
 
     def setPolDecel(self, decel:float):
         '''
         decel: deg/sec^2
         '''
-        decel *= self.STEPS_PER_DEGREE
+        decel *= self.steps_per_degree
         assert(1024 <= decel <= 67107840)
         hs = self.query(f"DCC={decel};")
         self.__checkHandshake("MotorController.setPolDecel", b':', hs)
@@ -311,7 +317,7 @@ class MotorController(MCInterface):
         data = removeDelims(data, self.DELIMS)
         decel = int(data[2])
         assert(self.MIN_ACCEL_STEPS < decel < self.MAX_ACCEL_STEPS)
-        decel = float(decel / self.STEPS_PER_DEGREE)
+        decel = float(decel / self.steps_per_degree)
         return decel
 
     def getPolTorque(self) -> float:
@@ -434,9 +440,9 @@ class MotorController(MCInterface):
         # negate because motors are opposite what we want to call (0,0)
         try:
             self.position = Position(
-                x = round(-(int(data[0]) / self.STEPS_PER_MM), 3),
-                y = round(-(int(data[1]) / self.STEPS_PER_MM), 3),
-                pol = round(int(data[2]) / self.STEPS_PER_DEGREE, 2)
+                x = round(-(int(data[0]) / self.steps_per_mm), 3),
+                y = round(-(int(data[1]) / self.steps_per_mm), 3),
+                pol = round(int(data[2]) / self.steps_per_degree, 2)
             )
         except:
             return None
@@ -482,7 +488,7 @@ class MotorController(MCInterface):
         '''
         interval_mm: mm
         '''
-        hs = self.query(f"DISTANCE={int(interval_mm * self.STEPS_PER_MM)};")
+        hs = self.query(f"DISTANCE={int(interval_mm * self.steps_per_mm)};")
         self.__checkHandshake("MotorController.setTriggerInterval", b':', hs)
 
     def startMove(self, withTrigger:bool = False, timeout:float = None):
@@ -500,10 +506,10 @@ class MotorController(MCInterface):
 
         vector = self.getPosition().calcMove(self.nextPos)
         # position absolute the pol axis:
-        hs = self.query(f"PAC={self.nextPos.pol * self.STEPS_PER_DEGREE};")
+        hs = self.query(f"PAC={self.nextPos.pol * self.steps_per_degree};")
         self.__checkHandshake("MotorController.startMove", b':', hs)
         # position relative the X and Y axes:
-        hs = self.query(f"PR {vector.x * self.STEPS_PER_MM}, {vector.y * self.STEPS_PER_MM};")
+        hs = self.query(f"PR {vector.x * self.steps_per_mm}, {vector.y * self.steps_per_mm};")
         self.__checkHandshake("MotorController.startMove", b':', hs)
         if withTrigger:
             hs = self.query(b'XQ #TRIGMV;')

@@ -33,7 +33,15 @@ class MCSimulator(MCInterface):
         )
         self.lastPos = deepcopy(self.position)
         self.nextPos = deepcopy(self.position)
+        self.setStepping()
     
+    def setStepping(self,
+            steps_per_mm: int = 5000,
+            steps_per_degree: float = 166.666666667
+        ):
+        self.steps_per_mm = steps_per_mm
+        self.steps_per_degre = steps_per_degree
+
     def connected(self) -> bool:
         return True
     
