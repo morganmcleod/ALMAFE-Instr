@@ -60,8 +60,8 @@ class MotorController(MCInterface):
                 steps_per_mm: int = 5000,
                 steps_per_degree: float = 166.666666667
             ):
-        self.steps_per_mm = steps_per_mm
-        self.steps_per_degre = steps_per_degree
+        self.steps_per_mm = int(steps_per_mm)
+        self.steps_per_degree = float(steps_per_degree)
 
     def __del__(self):
         try:
