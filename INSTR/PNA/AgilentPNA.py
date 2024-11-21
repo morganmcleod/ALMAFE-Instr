@@ -146,10 +146,10 @@ class AgilentPNA(BaseAgilentPNA):
         """Get instantaneous amplitude and phase
         :return (amplitude_dB, phase_deg)
         """
-        if self.measConfig.triggerSource == TriggerSource.MANUAL:
-            for _ in range(self.measConfig.sweepPoints):
-                self.generateTriggerSignal(self.measConfig.channel, True)
-                time.sleep(0.1)
+        # if self.measConfig.triggerSource == TriggerSource.MANUAL:
+        #     for _ in range(self.measConfig.sweepPoints):
+        #         self.generateTriggerSignal(self.measConfig.channel, True)
+        #         time.sleep(0.1)
         if self.checkSweepComplete(waitForComplete = True):
             trace = self.readData(self.measConfig.channel, self.measConfig.format, self.measConfig.sweepPoints, self.measConfig.measName)
             # Real and imaginary values are interleaved in the trace data
