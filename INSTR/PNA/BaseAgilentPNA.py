@@ -201,7 +201,7 @@ class BaseAgilentPNA(PNAInterface):
 
     def checkSweepComplete(self, waitForComplete:bool = True, timeoutSec:float = 20.0) -> bool:
         complete = False
-        startTime = time.time()
+        endTime = time.time() + timeoutSec
         while not complete:
             time.sleep(.020)
             result = removeDelims(self.inst.query(":STAT:OPER:DEV?"))
@@ -209,7 +209,7 @@ class BaseAgilentPNA(PNAInterface):
                 complete = True
             elif not waitForComplete:
                 break
-            elif time.time() - startTime > timeoutSec:
+            elif time.time() > endTime:
                 break
         return complete
 
