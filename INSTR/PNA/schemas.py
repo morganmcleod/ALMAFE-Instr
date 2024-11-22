@@ -42,38 +42,6 @@ class TriggerSource(Enum):
     MANUAL = "MAN"      # Sends one trigger signal when manually triggered from the front panel
                         # or software trigger is sent.
 
-class MeasConfig(BaseModel):
-    channel: int = 1         # in 1..32
-    measType: MeasType = MeasType.S21
-    format: Format = Format.SDATA
-    sweepType: SweepType = SweepType.CW_TIME
-    sweepGenType: SweepGenType = SweepGenType.STEPPED
-    sweepPoints: int = 20    # in 2..16001
-    triggerSource: TriggerSource = TriggerSource.MANUAL
-    bandWidthHz: int = 20e3  # in 1..250000.  Not all values are supported.
-                             # Analyzer will round up to the next valid setting.
-    centerFreq_Hz: int = 6e9 # Valid range is instrument-dependent
-    spanFreq_Hz: int = 1e9   # Valid range is instrument-dependent.  Typical is 10e6..20e9
-    timeout_sec: float = 10  # Sets selected channel sweep time value, if sweepGenType is ANALOG,
-                             # or sets the selected channel dwell time value, if sweepGenType is STEPPED. 
-                             # Note: Only set if "Sweep Time Auto" is "Off".
-    sweepTimeAuto: bool = True
-    measName: str = "MY_MEAS"
-    def getText(self):
-        return f"{self.measName}:CH{self.channel}:{self.measType.value}:{self.sweepType.value}:" + \
-               f"center {self.centerFreq_Hz}, span {self.spanFreq_Hz}, BW {self.bandWidthHz}, {self.sweepPoints} points"
-
-
-class PowerConfig(BaseModel):
-    channel: int = 1                # in 1..32
-    powerLevel_dBm: float = -10.0   # Channel output power in -90..+20
-    attenuation_dB: float = 0.0     # Channel attenuation in 0..70
-                                    # Note: Step is 10 dB. If a number other than these is entered, 
-                                    # the analyzer will select the next lower valid value. For example, 
-                                    # if 19.9 is entered, the analyzer will switch in 10 dB attenuation.
-    def getText(self):
-        return f"CH{self.channel}:power {self.powerLevel_dBm}, atten {self.attenuation_dB}"
-
 class Mode(Enum):
     CREATE = 0
     DELETE = 1
@@ -100,3 +68,37 @@ class DataFormat(Enum):
 class DataOrder(Enum):
     NORMAL = "NORM"
     SWAP = "SWAP"
+
+class MeasConfig(BaseModel):
+    channel: int = 1         # in 1..32
+    measType: MeasType = MeasType.S21
+    format: Format = Format.SDATA
+    sweepType: SweepType = SweepType.CW_TIME
+    sweepGenType: SweepGenType = SweepGenType.STEPPED
+    sweepPoints: int = 20    # in 2..16001
+    triggerSource: TriggerSource = TriggerSource.MANUAL
+    triggerMode: TriggerMode = TriggerMode.CONTINUOUS
+    bandWidthHz: int = 20e3  # in 1..250000.  Not all values are supported.
+                             # Analyzer will round up to the next valid setting.
+    centerFreq_Hz: int = 6e9 # Valid range is instrument-dependent
+    spanFreq_Hz: int = 1e9   # Valid range is instrument-dependent.  Typical is 10e6..20e9
+    timeout_sec: float = 10  # Sets selected channel sweep time value, if sweepGenType is ANALOG,
+                             # or sets the selected channel dwell time value, if sweepGenType is STEPPED. 
+                             # Note: Only set if "Sweep Time Auto" is "Off".
+    sweepTimeAuto: bool = True
+    measName: str = "MY_MEAS"
+    def getText(self):
+        return f"{self.measName}:CH{self.channel}:{self.measType.value}:{self.sweepType.value}:" + \
+               f"center {self.centerFreq_Hz}, span {self.spanFreq_Hz}, BW {self.bandWidthHz}, {self.sweepPoints} points"
+
+
+class PowerConfig(BaseModel):
+    channel: int = 1                # in 1..32
+    powerLevel_dBm: float = -10.0   # Channel output power in -90..+20
+    attenuation_dB: float = 0.0     # Channel attenuation in 0..70
+                                    # Note: Step is 10 dB. If a number other than these is entered, 
+                                    # the analyzer will select the next lower valid value. For example, 
+                                    # if 19.9 is entered, the analyzer will switch in 10 dB attenuation.
+    def getText(self):
+        return f"CH{self.channel}:power {self.powerLevel_dBm}, atten {self.attenuation_dB}"
+

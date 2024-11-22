@@ -14,6 +14,7 @@ DEFAULT_CONFIG = MeasConfig(
     sweepGenType = SweepGenType.STEPPED,
     sweepPoints = 6000,
     triggerSource = TriggerSource.IMMEDIATE,
+    triggerMode = TriggerMode.CONTINUOUS,
     bandWidthHz = 200,
     centerFreq_Hz = 10.180e9,
     spanFreq_Hz = 0,
@@ -30,6 +31,7 @@ FAST_CONFIG = MeasConfig(
     sweepGenType = SweepGenType.STEPPED,
     sweepPoints = 5,
     triggerSource = TriggerSource.MANUAL,
+    triggerMode = TriggerMode.CONTINUOUS,
     bandWidthHz = 200,
     centerFreq_Hz = 10.180e9,
     spanFreq_Hz = 0,
@@ -97,7 +99,7 @@ class AgilentPNA(BaseAgilentPNA):
                                    TriggerScope.CURRENT_CHANNEL if config.triggerSource == TriggerSource.EXTERNAL else TriggerScope.ALL_CHANNELS,
                                    TriggerLevel.HIGH,
                                    0.0005)
-        self.configureTriggerChannel(config.channel, triggerPoint = True, mode = TriggerMode.CONTINUOUS)
+        self.configureTriggerChannel(config.channel, triggerPoint = True, mode = config.triggerMode)
         # Use BNC1 for external trigger:
         self.inst.write(":CONT:SIGN BNC1,TILHIGH;")
         time.sleep(1)
@@ -146,10 +148,10 @@ class AgilentPNA(BaseAgilentPNA):
         """Get instantaneous amplitude and phase
         :return (amplitude_dB, phase_deg)
         """
-        # if self.measConfig.triggerSource == TriggerSource.MANUAL:
-        #     for _ in range(self.measConfig.sweepPoints):
-        #         self.generateTriggerSignal(self.measConfig.channel, True)
-        #         time.sleep(0.1)
+        if self.measConfig.triggerSource == TriggerSource.MANUAL and self.measConfig.triggerMode == TriggerMode.HOLD:
+            for _ in range(self.measConfig.sweepPoints):
+                self.generateTriggerSignal(self.measConfig.channel, True)
+                time.sleep(0.1)
         if self.checkSweepComplete(waitForComplete = True):
             trace = self.readData(self.measConfig.channel, self.measConfig.format, self.measConfig.sweepPoints, self.measConfig.measName)
             # Real and imaginary values are interleaved in the trace data
