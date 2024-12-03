@@ -227,3 +227,7 @@ class SpectrumAnalyzerSimulator():
         self.traceX = np.linspace(self.freqStart, self.freqStop, self.sweepPoints).tolist()
         self.traceY = np.random.normal(-32, 1, self.sweepPoints).tolist()
         return True, ""
+    
+    def configNarrowBand(self, center: float, span: float) -> tuple[bool, str]:
+        code, msg = self.errorQuery()
+        return code == 0, msg
