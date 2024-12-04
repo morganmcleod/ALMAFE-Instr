@@ -71,9 +71,8 @@ class SpectrumAnalyzer(BaseMXA):
             return False, "SpectrumAnalyzer.measureNarrowBand: wrong mode"
         self.configTraceType(1, TraceType.AVERAGE)
         self.configAveraging(averaging, AveragingType.RMS)
-        if averaging > 1:
-            self.restartTrace()
-            time.sleep(delay)        
+        self.restartTrace()
+        time.sleep(delay)
         iter = 3
         done = False
         # retry a couple times if we get an unreasonable power level:
@@ -108,8 +107,8 @@ class SpectrumAnalyzer(BaseMXA):
         if averaging > 1:
             self.configTraceType(1, TraceType.AVERAGE)
             self.configAveraging(averaging, AveragingType.RMS)
-            self.restartTrace()
-            time.sleep(delay)
+        self.restartTrace()
+        time.sleep(delay)
         iter = 3
         done = False
         # retry a couple times if we get an unreasonable power level:

@@ -360,3 +360,11 @@ class BaseMXA():
         self.markerY = ret[1]
         code, msg = self.errorQuery()
         return code == 0, msg
+
+    def readSweepTime(self) -> float:
+        ret = self.inst.query(":SENS:SWE:TIME?")
+        ret = removeDelims(ret)
+        if ret:
+            return float(ret[0])
+        else:
+            return 0.0
