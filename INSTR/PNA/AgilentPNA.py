@@ -99,9 +99,10 @@ class AgilentPNA(BaseAgilentPNA):
                                    TriggerScope.CURRENT_CHANNEL if config.triggerSource == TriggerSource.EXTERNAL else TriggerScope.ALL_CHANNELS,
                                    TriggerLevel.HIGH,
                                    0.0005)
-        self.configureTriggerChannel(config.channel, triggerPoint = True, mode = config.triggerMode)
+        self.triggerChannelSettings(config.channel, triggerPoint = True, mode = config.triggerMode)
         # Use BNC1 for external trigger:
-        self.inst.write(":CONT:SIGN BNC1,TILHIGH;")
+        if config.triggerSource == TriggerSource.EXTERNAL:
+            self.inst.write(":CONT:SIGN BNC1,TILHIGH;")
         time.sleep(1)
 
     def setPowerConfig(self, config:PowerConfig):
@@ -113,15 +114,15 @@ class AgilentPNA(BaseAgilentPNA):
         self.configurePowerLevel(config.channel, config.powerLevel_dBm)
         self.configurePowerState(True)
 
+    def generateTriggers(self):
+        for _ in range(self.measConfig.sweepPoints):
+            self.generateTriggerSignal(self.measConfig.channel, True)
+            time.sleep(0.1)
+
     def getTrace(self, *args, **kwargs) -> Tuple[List[float], List[float]]:
         """Get trace data as a list of float
         :return Tuple[List[float], List[float]]
         """
-        if self.measConfig.triggerSource == TriggerSource.MANUAL:
-            for _ in range(self.measConfig.sweepPoints):
-                self.generateTriggerSignal(self.measConfig.channel, True)
-                time.sleep(0.1)
-        
         sweepComplete = False
         startTime = time.time()
         elapsed = 0
@@ -148,10 +149,6 @@ class AgilentPNA(BaseAgilentPNA):
         """Get instantaneous amplitude and phase
         :return (amplitude_dB, phase_deg)
         """
-        if self.measConfig.triggerSource == TriggerSource.MANUAL and self.measConfig.triggerMode == TriggerMode.HOLD:
-            for _ in range(self.measConfig.sweepPoints):
-                self.generateTriggerSignal(self.measConfig.channel, True)
-                time.sleep(0.1)
         if self.checkSweepComplete(waitForComplete = True):
             trace = self.readData(self.measConfig.channel, self.measConfig.format, self.measConfig.sweepPoints, self.measConfig.measName)
             # Real and imaginary values are interleaved in the trace data

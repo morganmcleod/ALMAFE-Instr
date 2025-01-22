@@ -166,19 +166,23 @@ class BaseAgilentPNA(PNAInterface):
     def configureFreqCenterSpan(self, channel:int = 1, centerFreq_Hz:float = 1.5015e9, spanFreq_Hz:float = 2.9997e9):
         self.inst.write(f":SENS{channel}:FREQ:CENT {centerFreq_Hz};SPAN {spanFreq_Hz};")
 
-    def setTriggerSweepSignal(self, source:TriggerSource = TriggerSource.IMMEDIATE,
-                                    scope:TriggerScope = TriggerScope.ALL_CHANNELS,
-                                    level:TriggerLevel = TriggerLevel.LOW,
-                                    delaySeconds:float = 0.0):
+    def setTriggerSweepSignal(self, 
+            source:TriggerSource = TriggerSource.IMMEDIATE,
+            scope:TriggerScope = TriggerScope.ALL_CHANNELS,
+            level:TriggerLevel = TriggerLevel.LOW,
+            delaySeconds:float = 0.0
+        ):
         self.inst.write(f":TRIG:SOUR {source.value};:TRIG:SCOP {scope.value};")
         if source == TriggerSource.EXTERNAL:
             self.inst.write(f":TRIG:LEV {level.value};DEL {delaySeconds};")
         self.inst.write("*CLS")
 
-    def configureTriggerChannel(self, channel:int = 1, 
-                                      triggerPoint:bool = True, 
-                                      mode:TriggerMode = TriggerMode.CONTINUOUS,
-                                      count:int = 1):
+    def triggerChannelSettings(self, 
+            channel:int = 1, 
+            triggerPoint:bool = True, 
+            mode:TriggerMode = TriggerMode.CONTINUOUS,
+            count:int = 1
+        ):
         self.inst.write(f":SENS{channel}:SWE:TRIG:POIN {'ON' if triggerPoint else 'OFF'};")
         if mode == TriggerMode.COUNT:
             self.inst.write(f":SENS{channel}:SWE:GRO:COUN {count};")
@@ -198,6 +202,9 @@ class BaseAgilentPNA(PNAInterface):
             self.inst.write(f"*CLS;:INIT{channel};")
         else:
             self.inst.write(":ABOR;")
+
+    def initContinuous(self, channel:int = 1):
+        self.inst.write(f"*CLS;:INIT{channel}:CONT ON;")
 
     def checkSweepComplete(self, waitForComplete:bool = True, timeoutSec:float = 20.0) -> bool:
         complete = False
