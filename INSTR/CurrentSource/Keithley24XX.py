@@ -120,7 +120,15 @@ class CurrentSource():
         else:        
             self.inst.write(f":SOUR1:CURR {levelSelect.value};")
         return success, msg
-    
+
+    def readCurrent(self, averaging: int = 1) -> float:
+        sum = 0
+        for _ in range(averaging):
+            result = self.inst.query(":MEAS:CURR:DC?")
+            result = removeDelims(result)
+            sum += float(result[0])
+        return sum / averaging
+
     def setOutput(self, 
             enable: bool, 
             interlockState: bool = False, 
@@ -132,4 +140,3 @@ class CurrentSource():
         self.inst.write(f"Interlock:State {'On' if interlockState else 'Off'};")
         self.inst.write(f":OUTP {'On' if enable else 'Off'};")
         return success, msg
-  
