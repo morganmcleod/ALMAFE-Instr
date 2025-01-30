@@ -96,11 +96,9 @@ class SpectrumAnalyzer(BaseMXA):
         self.isNarrowBand = False
         self.configMarkerType(1, MarkerType.OFF)
     
-    def configWideBand(self,
-            bandLeftGHz: float = 4, 
-            bandRightGHz: float = 20, 
-            sweepPoints: int = 161) -> tuple[bool, str]:
-    
+    def configWideBand(self, center: float, span: float, sweepPoints: int = 161) -> tuple[bool, str]:
+        bandLeftGHz = center - (span / 2)
+        bandRightGHz = center + (span / 2)
         self.configMarkerType(1, MarkerType.OFF)
         self.configAcquisition(autoDetector = False, manualDetector = DetectorMode.NORMAL, sweepPoints = sweepPoints)
         self.configFreqStartStop(bandLeftGHz * 1e9, bandRightGHz * 1e9)
