@@ -49,6 +49,12 @@ class PNASimulator(PNAInterface):
         """
         self.powerConfig = config
     
+    def initContinuous(self, channel:int = 1) -> None:
+        pass
+
+    def generateTriggers(self) -> None:
+        pass
+
     def getTrace(self, *args, **kwargs) -> Tuple[List[float], List[float]]:
         """Get trace data as a list of float: amp, phase    
         :return Tuple[List[float], List[float]]

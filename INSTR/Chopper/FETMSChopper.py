@@ -59,6 +59,8 @@ class Chopper(Chopper_Interface):
     def reset(self):
         """Reset the chopper to a known and indexed state, with default settings for open/close movement.
         """
+        if self.simulate:
+            return
         # disable the motor        
         self.setMotorEnable(False)
         # set spinning to stopped
@@ -102,6 +104,8 @@ class Chopper(Chopper_Interface):
         state = self.taskSensor.read()
         if not self.spinning:
             return ChopperState.CLOSED if state else ChopperState.OPEN
+        else:
+            return ChopperState.SPINNING
     
     @property
     def openIsHot(self) -> bool:

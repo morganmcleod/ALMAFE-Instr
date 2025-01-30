@@ -60,7 +60,8 @@ class InputSwitch(InputSwitch_Interface):
     def selected(self, inputSelect: InputSelect):
         # send the compliment of the byte having the selected bit:
         self.position = inputSelect
-        self.switchController.staticWrite(255 - self.controlBits[inputSelect])
+        if not self.simulate:
+            self.switchController.staticWrite(255 - self.controlBits[inputSelect])
     
     def select_pol_sideband(self, pol: int = 0, sideband: int | str = 'USB') -> None:
         if pol not in (0, 1):
