@@ -26,7 +26,7 @@ class BaseE441X():
         if self.inst.connected and self.inst.inst.interface_type == pyvisa.constants.InterfaceType.asrl:
             self.inst.inst.end_input = pyvisa.constants.termination_char
             self.inst.inst.end_output = pyvisa.constants.termination_char
-            self.inst.write(":SYST:COMM:SER:TRAN:ECHO\sOFF;")
+            self.inst.write(":SYST:COMM:SER:TRAN:ECHO OFF;")
 
         ok = self.connected()
         if ok and idQuery:
