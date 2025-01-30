@@ -19,10 +19,10 @@ logger.addHandler(handler)
 logger.info("-----------------------------------------------------------------")
 
 from INSTR.Tests.Unit.test_KeysightE441X import test_PowerMeter
-# from INSTR.Tests.Unit.test_AgilentPNA import test_AgilentPNA
-# from INSTR.Tests.Unit.test_PNASimulator import test_PNASimulator
-# from INSTR.Tests.Unit.test_GalilDMCSocket import test_GalilDMCSocket
-# from INSTR.Tests.Unit.test_Lakeshore218 import test_Lakeshore218
+from INSTR.Tests.Unit.test_AgilentPNA import test_AgilentPNA
+from INSTR.Tests.Unit.test_PNASimulator import test_PNASimulator
+from INSTR.Tests.Unit.test_GalilDMCSocket import test_GalilDMCSocket
+from INSTR.Tests.Unit.test_Lakeshore218 import test_Lakeshore218
 
 if __name__ == "__main__":
     logger = logging.getLogger("ALMAFE-Instr")

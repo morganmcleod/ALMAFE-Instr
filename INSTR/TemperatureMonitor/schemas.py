@@ -6,9 +6,9 @@ DESCRIPTIONS = [
     '',
     '15K stage',
     '110K stage',
-    'RF source',
-    'LO',
-    'Ambient',
+    'Ambient load',
+    '',
+    '',
     ''
 ]
 

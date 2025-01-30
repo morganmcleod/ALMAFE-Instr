@@ -50,15 +50,9 @@ class OutputSwitch():
                        load: LoadSelect = LoadSelect.THROUGH,
                        pad: PadSelect = PadSelect.PAD_OUT) -> None:
         if not self.simulate:
-            # doing an extra toggle here because the swtich driver can be flaky
-            toSend = [
-                255,
-                255 - (OutputSelect.SQUARE_LAW.value + load.value + pad.value),
-                255 - (OutputSelect.POWER_METER.value + load.value + pad.value),
-            ]
+            self.switchController.staticWrite(255)
+            time.sleep(0.2)            
             if output == OutputSelect.SQUARE_LAW:
-                toSend[1], toSend[2] = toSend[2], toSend[1]
-            for b in toSend:
-                self.switchController.staticWrite(b)
-                time.sleep(0.2)
-
+                self.switchController.staticWrite(255 - (OutputSelect.SQUARE_LAW.value + load.value + pad.value))
+            else:
+                self.switchController.staticWrite(255 - (OutputSelect.POWER_METER.value + load.value + pad.value))

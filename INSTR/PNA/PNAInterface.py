@@ -48,6 +48,14 @@ class PNAInterface(ABC):
         pass
 
     @abstractmethod
+    def initContinuous(self, channel:int = 1) -> None:
+        pass
+
+    @abstractmethod
+    def generateTriggers(self) -> None:
+        pass
+
+    @abstractmethod
     def getTrace(self, *args, **kwargs) -> Tuple[List[float], List[float]]:
         """Get trace data as a two lists of float:  amp, phase
         :return Tuple[List[float], List[float]]

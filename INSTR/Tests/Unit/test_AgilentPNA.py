@@ -61,21 +61,26 @@ class test_AgilentPNA(unittest.TestCase):
 
     def test_getTrace(self):
         config = DEFAULT_CONFIG
-        config.sweepPoints = 401
-        # config.timeout_sec = 60
+        config.sweepPoints = 101
+        # can't test external trigger so switch to manual:
+        config.triggerSource = TriggerSource.MANUAL
         self.pna.setMeasConfig(config)
         self.assertFalse(self.__implErrorQuery())
         self.pna.setPowerConfig(DEFAULT_POWER_CONFIG)
         self.assertFalse(self.__implErrorQuery())
+        self.pna.generateTriggers()
+        self.assertFalse(self.__implErrorQuery())
         amp, phase = self.pna.getTrace()
         self.assertFalse(self.__implErrorQuery())
-        self.assertEqual(len(amp), 401)
-        self.assertEqual(len(phase), 401)
+        self.assertEqual(len(amp), config.sweepPoints)
+        self.assertEqual(len(phase), config.sweepPoints)
 
     def test_getAmpPhase(self):
         self.pna.setMeasConfig(FAST_CONFIG)
         self.assertFalse(self.__implErrorQuery())
         self.pna.setPowerConfig(DEFAULT_POWER_CONFIG)
+        self.assertFalse(self.__implErrorQuery())
+        self.pna.initContinuous()
         self.assertFalse(self.__implErrorQuery())
         for _ in range(10):
             amp, phase = self.pna.getAmpPhase()
@@ -242,7 +247,7 @@ class test_AgilentPNA(unittest.TestCase):
         self.assertFalse(self.__implErrorQuery())
 
     def test_configureTriggerChannel(self):
-        self.pna.configureTriggerChannel(
+        self.pna.triggerChannelSettings(
             channel = 1,
             triggerPoint = True,
             mode = TriggerMode.CONTINUOUS,

@@ -22,6 +22,8 @@ class MCSimulator(MCInterface):
     def __init__(self):
         self.logger = logging.getLogger("ALMAFE-Instr")
         self.logger.info(f"MCSimulator created")
+        self.host=""
+        self.port=0
         self.start = False
         self.stop = False
         self.xySpeed = self.XY_SPEED

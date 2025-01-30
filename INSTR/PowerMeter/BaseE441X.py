@@ -88,10 +88,14 @@ class BaseE441X():
         """
         opc = removeDelims(self.inst.query("*RST;*OPC?"))
         if opc and opc[0]:
-            self.inst.write("*CLS;*ESE 60;:STAT:OPER:NTR 65535;:FORM:READ:DATA ASC;")
-            return True
-        else:
-            return False
+            # Clear status registers
+            # Event status enable: Query Error + Device Dependent Error + Execution Error + Command Error
+            # configure Operation Status Negative Transition Filter
+            # configure ASCII readings
+            opc = self.inst.query("*CLS;*ESE 60;:STAT:OPER:NTR 65535;:FORM:READ:DATA ASC;*OPC?")
+            if opc and opc[0]:
+                return True
+        return False
 
     def errorQuery(self):
         """Send an error query and return the results

@@ -1,7 +1,18 @@
 import logging
+from .Attenuator import Attenuator
+from .NoiseSource import NoiseSource
+from .OutputSwitch import OutputSwitch
+from .YIGFilter import YIGFilter
+from INSTR.InputSwitch.Interface import InputSwitch_Interface
 
 class WarmIFPlate():
-    def __init__(self, attenuator, inputSwitch, noiseSource, outputSwitch, yigFilter):
+    def __init__(self, 
+            attenuator: Attenuator, 
+            inputSwitch: InputSwitch_Interface, 
+            noiseSource: NoiseSource, 
+            outputSwitch: OutputSwitch, 
+            yigFilter: YIGFilter
+        ):
         self.logger = logging.getLogger("ALMAFE-Instr")
         self.logger.info(f"WarmIFPlate created")
     
