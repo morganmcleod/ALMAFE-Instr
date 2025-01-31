@@ -1,7 +1,7 @@
 import logging
 import time
 import nidaqmx
-import nidaqmx.constants
+from nidaqmx.constants import LineGrouping
 from .Interface import InputSwitch_Interface, InputSelect
 
 class DigitalOut0():
@@ -12,18 +12,19 @@ class DigitalOut0():
         self.latchHoldTime = latchHoldTime
         self.simulate = simulate
         if not simulate:        
-            self.taskData = self._initTask('Dev1/port0/line0..2', 'data', False)
-            self.taskAddress = self._initTask('Dev1/port0/line3..5', 'address', False)
-            self.taskLatch = self._initTask('Dev1/port0/line6', 'address', False)
+            self.taskData = self._initTask('Dev1/port0/line0:2', 'data', False)
+            self.taskAddress = self._initTask('Dev1/port0/line3:5', 'address', False)
+            self.taskLatch = self._initTask('Dev1/port0/line6', 'latch', False)
 
     def _initTask(self, lines: str, name: str = "", isInput: bool = True) -> nidaqmx.Task | None:
         def constructAssign(lines, name, isInput) -> nidaqmx.Task | None:
             try:
                 task = nidaqmx.Task(name)
                 if isInput:
-                    task.di_channels.add_di_chan(lines, name)
+                    task.di_channels.add_di_chan(lines, name, line_grouping = LineGrouping.CHAN_PER_LINE)
                 else:
-                    task.do_channels.add_do_chan(lines, name)
+                    task.do_channels.add_do_chan(lines, name, line_grouping = LineGrouping.CHAN_PER_LINE)
+                task.start()
                 return task
             except:
                 task = nidaqmx.Task(name)
@@ -37,8 +38,11 @@ class DigitalOut0():
 
     def write(self, address: int, data: int):
         if not self.simulate:
-            self.taskData.write(data, auto_start = True)
-            self.taskAddress.write(address, auto_start = True)
+            # convert ints to list[bool] with LSB first:
+            data = [True if data & (1 << (2 - n)) else False for n in range(2, -1, -1)]
+            address = [True if address & (1 << (2 - n)) else False for n in range(2, -1, -1)]
+            self.taskData.write(data)
+            self.taskAddress.write(address)
             self.taskLatch.write(True)
             time.sleep(self.latchHoldTime)
             self.taskLatch.write(False)
@@ -79,6 +83,7 @@ class InputSwitch_MTS2(InputSwitch_Interface):
     # is shorted.
 
     MODES = {
+        # For each mode: SET address, SET data, RESET address:
         InputSelect.POL0_USB: (ADDR_SET_USB, DATA_MUX_SELECT3, ADDR_RESET_MIXER),
         InputSelect.POL1_USB: (ADDR_SET_USB, DATA_MUX_SELECT3, ADDR_RESET_MIXER),
         InputSelect.POL0_LSB: (ADDR_SET_LSB, DATA_MUX_SELECT3, ADDR_RESET_MIXER),
@@ -98,7 +103,7 @@ class InputSwitch_MTS2(InputSwitch_Interface):
         else:
             self.logger.info(f"InputSwitch_MTS2 created")
         self.simulate = simulate
-        self.digitalOut = DigitalOut0(simulate)
+        self.digitalOut = DigitalOut0(simulate = simulate)
         self.reset()
 
     def reset(self) -> None:
@@ -106,15 +111,15 @@ class InputSwitch_MTS2(InputSwitch_Interface):
         self.digitalOut.write(self.ADDR_RESET_HOTLOAD, self.DATA_MUX_SELECT3)
         self.digitalOut.write(self.ADDR_RESET_COLDLOAD, self.DATA_MUX_SELECT3)
         self.digitalOut.write(self.ADDR_RESET_SPARE1, self.DATA_MUX_SELECT4)
-        self.digitalOut.write(self.ADDR_RESET_SPARE2, self.DATA_MUX_SELECT4)            
-        self.selected = InputSelect.POL0_USB
-        self.lastAddress = self.ADDR_RESET_MIXER
-        self.lastMux = self.DATA_MUX_SELECT3
+        self.digitalOut.write(self.ADDR_RESET_SPARE2, self.DATA_MUX_SELECT4)
+        self.digitalOut.write(self.ADDR_SET_MIXER, self.DATA_MUX_SELECT3)
+        self.digitalOut.write(self.ADDR_SET_USB, self.DATA_MUX_SELECT3)
+        self._selected = InputSelect.POL0_USB
 
     @property
     def device_info(self) -> dict:
         return {
-            "name": "B6v2 external input switch",
+            "name": "MTS2 coaxial switch",
             "resource": "",
             "connected": self.connected()
         }
@@ -126,27 +131,29 @@ class InputSwitch_MTS2(InputSwitch_Interface):
     def selected(self) -> InputSelect:
         return self._selected
 
-    @selected.setter    
-    def selected(self, inputSelect: InputSelect):
-        addr = self.MODES[inputSelect][0]
-        mux = self.MODES[inputSelect][1]
-        self.lastAddress = self.MODES[inputSelect][2]
-        
-        if inputSelect in (InputSelect.POL0_LSB, InputSelect.POL0_USB, InputSelect.POL1_LSB, InputSelect.POL1_USB):
-            if self.lastAddress != self.ADDR_RESET_MIXER:
-                # reset mixer
-                self.digitalOut(self.ADDR_RESET_MIXER, self.DATA_MUX_SELECT3)
-            # set mixer:
-            self.digitalOut(self.ADDR_SET_MIXER, self.DATA_MUX_SELECT3)
-            # set sideband:
-            self.digitalOut(addr, mux)
-            self.lastMux = mux
+    def is_mixer(self, inputSelect: InputSelect):
+        return inputSelect in (InputSelect.POL0_LSB, InputSelect.POL0_USB, InputSelect.POL1_LSB, InputSelect.POL1_USB)
+
+    def is_reset_required(self, inputSelect: InputSelect):
+        if self.is_mixer(inputSelect) and self.is_mixer(self._selected):
+            return False
+        elif inputSelect == self._selected:
+            return False
         else:
-            # reset previous:
-            self.digitalOut(self.lastAddress, self.lastMux)
-            # set current:
-            self.digitalOut(addr, mux)            
-            self.lastMux = mux
+            return True
+
+    @selected.setter    
+    def selected(self, inputSelect: InputSelect):        
+        if self.is_reset_required(inputSelect):
+            # reset the current switch:
+            self.digitalOut.write(self.MODES[self._selected][2], self.MODES[self._selected][1])
+            # enable mixer:
+            if self.is_mixer(inputSelect):
+                self.digitalOut.write(self.ADDR_SET_MIXER, self.DATA_MUX_SELECT3)
+
+        # select new switch:
+        self.digitalOut.write(self.MODES[inputSelect][0], self.MODES[inputSelect][1])
+        self._selected = inputSelect        
 
     def select_pol_sideband(self, pol: int = 0, sideband: int | str = 'USB') -> None:
         if pol not in (0, 1):
