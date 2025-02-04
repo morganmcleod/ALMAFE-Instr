@@ -51,8 +51,13 @@ class OutputSwitch():
                        pad: PadSelect = PadSelect.PAD_OUT) -> None:
         if not self.simulate:
             self.switchController.staticWrite(255)
-            time.sleep(0.2)            
+            time.sleep(0.2)
             if output == OutputSelect.SQUARE_LAW:
+                # toggle it twice because of sticky switch in CTS1:
+                self.switchController.staticWrite(255 - (OutputSelect.POWER_METER.value + load.value + pad.value))
+                time.sleep(0.2)
                 self.switchController.staticWrite(255 - (OutputSelect.SQUARE_LAW.value + load.value + pad.value))
             else:
+                self.switchController.staticWrite(255 - (OutputSelect.SQUARE_LAW.value + load.value + pad.value))
+                time.sleep(0.2)
                 self.switchController.staticWrite(255 - (OutputSelect.POWER_METER.value + load.value + pad.value))
