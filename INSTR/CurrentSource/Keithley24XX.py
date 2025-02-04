@@ -64,14 +64,12 @@ class CurrentSource():
         """
         self.mfr = "KEITHLEY"
         response = self.inst.query("*IDN?")
-        match = re.search(r"2400", response, flags=re.IGNORECASE)
+        match = re.search(r"KEITHLEY", response, flags=re.IGNORECASE)
         if match:
             self.mfr = match.group()
-            match = re.search("(E3631|E3632|E3633|E3634)", response)
+            match = re.search(r"2400", response)
             if match:
                 self.model = match.group()
-            else:
-                self.model = response.split(',')[1:4]
             self.logger.debug(self.mfr + " " + self.model)
             return True
         return False
