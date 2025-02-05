@@ -47,7 +47,10 @@ class Chopper(Chopper_Interface):
         return task
 
     def __del__(self):
-        self.setMotorEnable(False)
+        try:
+            self.setMotorEnable(False)
+        except:
+            pass
         if not self.simulate:
             self.taskSensor.close()
             self.taskBusy.close()

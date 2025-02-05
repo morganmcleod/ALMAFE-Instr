@@ -34,8 +34,6 @@ class CurrentSource():
         self.mfr = None
         self.model = None
         self.inst = VisaInstrument(resource, timeout = self.DEFAULT_TIMEOUT)
-        if reset:
-            self.reset()
         ok = self.connected()
         if ok and idQuery:
             ok = self.idQuery()
@@ -89,7 +87,7 @@ class CurrentSource():
             return False
 
     def setRearTerminals(self):
-        self.inst.write(":ROUT:TERM:REAR;")
+        self.inst.write(":ROUT:TERM REAR;")
 
     def setCurrentSource(self, 
             currentA: float,
@@ -100,6 +98,7 @@ class CurrentSource():
         success = True
         msg = ""
         # only fixed mode supported in this version:
+        self.inst.write(":SOUR1:FUNC CURR;")
         self.inst.write(":SOUR1:CURR:MODE FIX;")
 
         if rangeSelect == CurrentRange.BY_VALUE:
@@ -122,9 +121,10 @@ class CurrentSource():
     def readCurrent(self, averaging: int = 1) -> float:
         sum = 0
         for _ in range(averaging):
-            result = self.inst.query(":MEAS:CURR:DC?")
+            self.inst.write(":MEAS:CURR:DC?", termination = "\n")
+            result = self.inst.read(termination = "\n")
             result = removeDelims(result)
-            sum += float(result[0])
+            sum += float(result[1])
         return sum / averaging
 
     def setOutput(self, 
@@ -134,7 +134,6 @@ class CurrentSource():
         ) -> tuple[bool, str]:
         success = True
         msg = ""
-        self.inst.write(f":OUTP:SMODE {impedanceMode.value};")
-        self.inst.write(f"Interlock:State {'On' if interlockState else 'Off'};")
+        self.inst.write(f":OUTP:SMODE {impedanceMode.value};Interlock:State {'On' if interlockState else 'Off'};")
         self.inst.write(f":OUTP {'On' if enable else 'Off'};")
         return success, msg
