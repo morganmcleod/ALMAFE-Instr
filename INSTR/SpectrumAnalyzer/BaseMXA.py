@@ -152,17 +152,18 @@ class BaseMXA():
         return code == 0, msg
     
     def configLevel(self, 
-            refLevel: float = 0, 
+            refLevel: float = -30, 
             refLevelOffset: float = 0, 
             units: LevelUnits = LevelUnits.DBM,
-            autoAtten: bool = True,
+            autoAtten: bool = None,
             manualAtten: float = 10) -> tuple[bool, str]:
         self.inst.write(f":UNIT:POW {units.value}")
         self.inst.write(f":DISP:WIND:TRAC:Y:RLEV {refLevel};:DISP:WIND:TRAC:Y:RLEV:OFFS {refLevelOffset};")
-        if autoAtten:
-            self.inst.write(":POW:ATT:AUTO ON;")
-        else:
-            self.inst.write(f":POW:ATT:AUTO OFF;:POW:ATT {manualAtten};")
+        if autoAtten is not None:
+            if autoAtten:
+                self.inst.write(":POW:ATT:AUTO ON;")
+            else:
+                self.inst.write(f":POW:ATT:AUTO OFF;:POW:ATT {manualAtten};")
         code, msg = self.errorQuery()
         return code == 0, msg
     
