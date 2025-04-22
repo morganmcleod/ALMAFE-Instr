@@ -113,7 +113,7 @@ class Chopper(Chopper_Interface):
         new = 100 * (pos // 100) + 75
         self.__gotoPosition(new)
         if not self.__waitForStop():
-            self.logger.debug("Chopper open: timeout")
+            self.logger.error("Chopper open: timeout")
         self.spinning = False
        
     def close(self):
@@ -124,7 +124,7 @@ class Chopper(Chopper_Interface):
         new = 100 * (pos // 100) + 25
         self.__gotoPosition(new)
         if not self.__waitForStop():
-            self.logger.debug("Chopper close: timeout")
+            self.logger.error("Chopper close: timeout")
         self.spinning = False
 
     def gotoHot(self):
@@ -181,7 +181,7 @@ class Chopper(Chopper_Interface):
         if not self.__waitForStop():
             timeout = True
         if timeout:
-            self.logger.debug("Chopper __findOpen: timeout")
+            self.logger.error("Chopper __findOpen: timeout")
 
     def __waitForFC(self, stopValue:bool) -> bool:
         """Wait for the full-clock signal to have the specifed stopValue
@@ -270,7 +270,6 @@ class Chopper(Chopper_Interface):
         read = removeDelims(read)
         if len(read) >= 3:
             currPos = int(float(read[2]))
-            self.logger.debug(f"Chopper: currPos={currPos}")
             return currPos
         else:
             return 0
@@ -301,7 +300,6 @@ class Chopper(Chopper_Interface):
             time.sleep(0.1)
             num = self.inst.in_waiting
             read = self.inst.read(num)
-            self.logger.debug(read)
             return read.decode()
         except Exception as e:
             self.logger.exception(e)
