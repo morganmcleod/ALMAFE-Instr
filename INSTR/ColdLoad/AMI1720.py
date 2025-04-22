@@ -170,8 +170,8 @@ class AMI1720(ColdLoadBase):
             return FillState.UNKNOWN
 
     def shouldPause(self, 
-            minLevel: float = 55, 
-            maxLevel: float = 110, 
+            minLevel: float = 20, 
+            maxLevel: float = 150, 
             enablePause: bool = True) -> tuple[bool, str]:
         """Should the calling measurement procedure pause and wait for cold load intervention?
 

@@ -92,9 +92,11 @@ class SpectrumAnalyzer(BaseMXA):
         self.isNarrowBand = False
         self.configMarkerType(1, MarkerType.OFF)
     
-    def configWideBand(self, center: float, span: float, sweepPoints: int = 161) -> tuple[bool, str]:
+    def configWideBand(self, center: float, span: float, sweepPoints: int = None) -> tuple[bool, str]:
         self.isWideBand = True  
         self.configMarkerType(1, MarkerType.OFF)
+        if sweepPoints is None:
+            sweepPoints = self.settings.sweepPoints
         self.configAcquisition(autoDetector = False, manualDetector = DetectorMode.NORMAL, sweepPoints = sweepPoints)
         self.configFreqCenterSpan(center * 1e9, span * 1e9)
         self.configTraceType(1, TraceType.CLEAR_WRITE)

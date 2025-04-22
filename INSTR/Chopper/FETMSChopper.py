@@ -11,12 +11,12 @@ class Chopper(Chopper_Interface):
         self._openIsHot = openIsHot
         self.simulate = simulate
         if not simulate:        
-            self.taskBusy = self._initTask('Dev2/port0/line6', 'inBusy', True)
-            self.taskSensor = self._initTask('Dev2/port0/line2', 'inSensor', True)
             self.taskSpeed = self._initTask('Dev2/port0/line1', 'outSpeed', False)
+            self.taskSensor = self._initTask('Dev2/port0/line2', 'inSensor', True)
             self.taskOpenClose = self._initTask('Dev2/port0/line3', 'outOpenClose', False)
             self.taskSpin = self._initTask('Dev2/port0/line4', 'outSpin', False)
             self.taskEnable = self._initTask('Dev2/port0/line5', 'outEnable', False)
+            self.taskBusy = self._initTask('Dev2/port0/line6', 'inBusy', True)
             self.taskSensor.start()
             self.taskBusy.start()
             self.taskSpeed.start()
@@ -87,8 +87,8 @@ class Chopper(Chopper_Interface):
         endTime = time.time() + timeout
         busy = True
         while busy and time.time() <= endTime:
-            busy = self.taskBusy.read()
             time.sleep(0.010)
+            busy = self.taskBusy.read()
 
     def connected(self) -> bool:
         if self.simulate:

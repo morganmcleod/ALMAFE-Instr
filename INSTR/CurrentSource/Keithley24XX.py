@@ -121,7 +121,7 @@ class CurrentSource():
     def readCurrent(self, averaging: int = 1) -> float:
         sum = 0
         for _ in range(averaging):
-            self.inst.write(":MEAS:CURR:DC?", termination = "\n")
+            self.inst.write(":MEASURE:CURR:DC?", termination = "\n")
             result = self.inst.read(termination = "\n")
             result = removeDelims(result)
             sum += float(result[1])
