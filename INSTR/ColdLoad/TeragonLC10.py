@@ -144,5 +144,6 @@ class TeragonLC10(ColdLoadBase):
                 else:
                     self.setCurrentValve(3 - self.currentValve)
                     self.fillTimeoutAt = time.time() + self.FILL_TIMEOUT
-                    return False, "Switched to valve 2."
+                    return False, f"Switched to valve {self.currentValve}."
         return False, ""
+ 
