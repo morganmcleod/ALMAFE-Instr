@@ -11,12 +11,12 @@ class Chopper(Chopper_Interface):
         self._openIsHot = openIsHot
         self.simulate = simulate
         if not simulate:        
-            self.taskBusy = self._initTask('Dev2/port0/line6', 'inBusy', True)
-            self.taskSensor = self._initTask('Dev2/port0/line2', 'inSensor', True)
             self.taskSpeed = self._initTask('Dev2/port0/line1', 'outSpeed', False)
+            self.taskSensor = self._initTask('Dev2/port0/line2', 'inSensor', True)
             self.taskOpenClose = self._initTask('Dev2/port0/line3', 'outOpenClose', False)
             self.taskSpin = self._initTask('Dev2/port0/line4', 'outSpin', False)
             self.taskEnable = self._initTask('Dev2/port0/line5', 'outEnable', False)
+            self.taskBusy = self._initTask('Dev2/port0/line6', 'inBusy', True)
             self.taskSensor.start()
             self.taskBusy.start()
             self.taskSpeed.start()
@@ -47,7 +47,10 @@ class Chopper(Chopper_Interface):
         return task
 
     def __del__(self):
-        self.setMotorEnable(False)
+        try:
+            self.setMotorEnable(False)
+        except:
+            pass
         if not self.simulate:
             self.taskSensor.close()
             self.taskBusy.close()
@@ -59,6 +62,8 @@ class Chopper(Chopper_Interface):
     def reset(self):
         """Reset the chopper to a known and indexed state, with default settings for open/close movement.
         """
+        if self.simulate:
+            return
         # disable the motor        
         self.setMotorEnable(False)
         # set spinning to stopped
@@ -82,8 +87,8 @@ class Chopper(Chopper_Interface):
         endTime = time.time() + timeout
         busy = True
         while busy and time.time() <= endTime:
-            busy = self.taskBusy.read()
             time.sleep(0.010)
+            busy = self.taskBusy.read()
 
     def connected(self) -> bool:
         if self.simulate:
@@ -102,6 +107,8 @@ class Chopper(Chopper_Interface):
         state = self.taskSensor.read()
         if not self.spinning:
             return ChopperState.CLOSED if state else ChopperState.OPEN
+        else:
+            return ChopperState.SPINNING
     
     @property
     def openIsHot(self) -> bool:

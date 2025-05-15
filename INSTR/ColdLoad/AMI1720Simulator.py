@@ -71,7 +71,7 @@ class AMI1720Simulator(ColdLoadBase):
         return self.fillState
 
     def shouldPause(self, 
-            minLevel: float = 55, 
-            maxLevel: float = 110, 
+            minLevel: float = 20, 
+            maxLevel: float = 150, 
             enablePause: bool = True) -> tuple[bool, str]:
         return False, ""

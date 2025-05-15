@@ -34,8 +34,6 @@ class CurrentSource():
         self.mfr = None
         self.model = None
         self.inst = VisaInstrument(resource, timeout = self.DEFAULT_TIMEOUT)
-        if reset:
-            self.reset()
         ok = self.connected()
         if ok and idQuery:
             ok = self.idQuery()
@@ -63,17 +61,13 @@ class CurrentSource():
         :return bool: True if the instrument is compatible with this class.
         """
         self.mfr = "KEITHLEY"
-        self.model = self.inst.query("*IDN?")
-        return True
-    
-        match = re.match(r"[ ]*((AGILENT|KEYSIGHT)\s+TECHNOLOGIES|HEWLETT-PACKARD)\s*\,", response, flags=re.IGNORECASE)
+        response = self.inst.query("*IDN?")
+        match = re.search(r"KEITHLEY", response, flags=re.IGNORECASE)
         if match:
             self.mfr = match.group()
-            match = re.search("(E3631|E3632|E3633|E3634)", response)
+            match = re.search(r"2400", response)
             if match:
                 self.model = match.group()
-            else:
-                self.model = response.split(',')[1:4]
             self.logger.debug(self.mfr + " " + self.model)
             return True
         return False
@@ -84,19 +78,27 @@ class CurrentSource():
         :return bool: True if instrument responed to Operation Complete query
         """
         if self.inst.query("*RST;*OPC?"):
+            # powerline cycles = 1
+            self.inst.write(":SENS:CURR:NPLC 1.0E+0;")
+            # compliance 0.000105
+            self.inst.write(":SENS:CURR:DC:PROT 1.05E-4;")
             return True
         else:
             return False
-        
+
+    def setRearTerminals(self):
+        self.inst.write(":ROUT:TERM REAR;")
+
     def setCurrentSource(self, 
             currentA: float,
             rangeA: float = 0,
             rangeSelect: CurrentRange = CurrentRange.MAXIMUM,
             levelSelect: CurrentLevel = CurrentLevel.BY_VALUE
-            ) -> tuple[bool, str]:
+        ) -> tuple[bool, str]:
         success = True
         msg = ""
         # only fixed mode supported in this version:
+        self.inst.write(":SOUR1:FUNC CURR;")
         self.inst.write(":SOUR1:CURR:MODE FIX;")
 
         if rangeSelect == CurrentRange.BY_VALUE:
@@ -115,16 +117,23 @@ class CurrentSource():
         else:        
             self.inst.write(f":SOUR1:CURR {levelSelect.value};")
         return success, msg
-    
+
+    def readCurrent(self, averaging: int = 1) -> float:
+        sum = 0
+        for _ in range(averaging):
+            self.inst.write(":MEASURE:CURR:DC?", termination = "\n")
+            result = self.inst.read(termination = "\n")
+            result = removeDelims(result)
+            sum += float(result[1])
+        return sum / averaging
+
     def setOutput(self, 
             enable: bool, 
             interlockState: bool = False, 
             impedanceMode: OutputImpedanceMode = OutputImpedanceMode.NORMAL
-            ) -> tuple[bool, str]:
+        ) -> tuple[bool, str]:
         success = True
         msg = ""
-        self.inst.write(f":OUTP:SMODE {impedanceMode.value};")
-        self.inst.write(f"Interlock:State {'On' if interlockState else 'Off'};")
+        self.inst.write(f":OUTP:SMODE {impedanceMode.value};Interlock:State {'On' if interlockState else 'Off'};")
         self.inst.write(f":OUTP {'On' if enable else 'Off'};")
         return success, msg
-    

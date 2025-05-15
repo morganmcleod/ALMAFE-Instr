@@ -23,6 +23,7 @@ class SpectrumAnalyzer(BaseMXA):
     def configureAll(self, settings: SpectrumAnalyzerSettings):
         self.settings = settings
         self.isNarrowBand = False
+        self.isWideBand = False
         self.configAcquisition(
             autoDetector = False,
             manualDetector = DetectorMode.AVERAGE,
@@ -58,15 +59,16 @@ class SpectrumAnalyzer(BaseMXA):
         )
 
     def configNarrowBand(self, center: float, span: float) -> tuple[bool, str]:
-        self.isNarrowBand = True
+        self.isNarrowBand = True                
         self.configMarkerType(1, MarkerType.OFF)
-        self.configAcquisition(autoDetector = False, manualDetector = DetectorMode.NORMAL, sweepPoints = 51)
+        self.configAcquisition(autoDetector = False, manualDetector = DetectorMode.NORMAL, sweepPoints = 1)
         self.configFreqCenterSpan(center * 1e9, span * 1e9)
+        self.configLevel(-30)
         self.configMarkerType(1, MarkerType.NORMAL)
         code, msg = self.errorQuery()
         return code == 0, msg
 
-    def measureNarrowBand(self, averaging: int = 1, delay = 0) -> tuple[bool, str]:
+    def measureNarrowBand(self, averaging: int = 1, delay: float = 0) -> tuple[bool, str]:
         if not self.isNarrowBand:
             return False, "SpectrumAnalyzer.measureNarrowBand: wrong mode"
         self.configTraceType(1, TraceType.AVERAGE)
@@ -90,9 +92,11 @@ class SpectrumAnalyzer(BaseMXA):
         self.isNarrowBand = False
         self.configMarkerType(1, MarkerType.OFF)
     
-    def configWideBand(self, center: float, span: float, sweepPoints: int = 161) -> tuple[bool, str]:
+    def configWideBand(self, center: float, span: float, sweepPoints: int = None) -> tuple[bool, str]:
         self.isWideBand = True  
         self.configMarkerType(1, MarkerType.OFF)
+        if sweepPoints is None:
+            sweepPoints = self.settings.sweepPoints
         self.configAcquisition(autoDetector = False, manualDetector = DetectorMode.NORMAL, sweepPoints = sweepPoints)
         self.configFreqCenterSpan(center * 1e9, span * 1e9)
         self.configTraceType(1, TraceType.CLEAR_WRITE)
